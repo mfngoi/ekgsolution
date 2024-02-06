@@ -1,0 +1,9 @@
+{
+    "particle.targetDevice": "e00fce684219e0e249d5bc42",
+    "files.associations": {
+        "deque": "cpp",
+        "string": "cpp",
+        "vector": "cpp",
+        "list": "cpp"
+    }
+}
