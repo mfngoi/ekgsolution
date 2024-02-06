@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "878198376092",
+    "project_id": "test-auth-eaf78",
+    "storage_bucket": "test-auth-eaf78.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:878198376092:android:9211068e3173d10bb90f59",
+        "android_client_info": {
+          "package_name": "com.example.flutter_application"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAnhoiHFaCbhXZvSfuJV-cmgp9KCb8p4yQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
