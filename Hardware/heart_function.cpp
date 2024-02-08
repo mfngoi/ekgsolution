@@ -57,7 +57,7 @@ int uploadEKGData(String cmd)
 {
   Serial.println("Running ekg function...");
 
-  std::list<int> ekgList;
+  std::list<int> ekgList = {};
   ekgStartTime = millis();
 
   while((millis() - ekgStartTime) < ekgExpirationTime.count()) {
@@ -71,12 +71,15 @@ int uploadEKGData(String cmd)
           ekgList.push_back(analogRead(A0));
       }
       //Wait for a bit to keep serial data from saturating
-      delay(1);
+      delay(20);
   }
 
   Serial.println("Printing list...");
   for(int number: ekgList) {
     Serial.println(number);
   }
+
+  // Particle.publish("PublishTest", String(ekgList));
+
   return 1;
 }
