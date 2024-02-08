@@ -22,10 +22,6 @@ SYSTEM_THREAD(ENABLED);
 // View logs with CLI using 'particle serial monitor --follow'
 SerialLogHandler logHandler(LOG_LEVEL_INFO); 
 
-// Time controllers
-unsigned long ekgStartTime = 0;
-std::chrono::milliseconds ekgExpirationTime = 10s;
-
 // Declare function
 int uploadEKGData(String cmd);
 
@@ -45,41 +41,47 @@ void loop()
 
 }
 
-void showlist(std::list<int> g)
-{
-    std::list<int>::iterator it;
-    for(it = g.begin(); it != g.end(); ++it) {
-        Serial.println(*it);
-    }
-}
-
 int uploadEKGData(String cmd)
 {
-  Serial.println("Running ekg function...");
+    Serial.println("Running ekg function...");
 
-  std::list<int> ekgList = {};
-  ekgStartTime = millis();
+    std::list<int> ekgList = {};
+    unsigned long ekgStartTime = millis();
+    std::chrono::milliseconds ekgExpirationTime = 10s;
+    int ekgCounter = 0;
 
-  while((millis() - ekgStartTime) < ekgExpirationTime.count()) {
-      if((digitalRead(D0) == 1)||(digitalRead(D1) == 1)){
-          Serial.println('!');
-          ekgList.push_back(-1);
-      }
-      else{
-          // send the value of analog input 0:
-          Serial.println(analogRead(A0));
-          ekgList.push_back(analogRead(A0));
-      }
-      //Wait for a bit to keep serial data from saturating
-      delay(20);
-  }
+    Serial.println("Running heart sensor for 10 seconds... ");
+    while ((millis() - ekgStartTime) < ekgExpirationTime.count())
+    {
+        if ((digitalRead(D0) == 1) || (digitalRead(D1) == 1))
+        {
+            // Serial.println('!');
+            ekgList.push_back(-1);
+        }
+        else
+        {
+            // send the value of analog input 0:
+            // Serial.println(analogRead(A0));
+            ekgList.push_back(analogRead(A0));
+        }
+        // Wait for a bit to keep serial data from saturating
+        ekgCounter += 1;
+        delay(20);
+    }
+    Serial.println("Heart sensor finished reading...");
+    Serial.println(ekgCounter);
 
-  Serial.println("Printing list...");
-  for(int number: ekgList) {
-    Serial.println(number);
-  }
+    Serial.println("Printing list...");
+    std::string ekgString = "";
+    for (int number : ekgList)
+    {
+        // Serial.println(number);
+        ekgString += std::to_string(number) + ",";
+    }
 
-  // Particle.publish("PublishTest", String(ekgList));
+    Log.info(ekgString.c_str());
+    Particle.publish("PublishTest", ekgString.c_str());
+    Serial.println("Published ekg data...");
 
-  return 1;
+    return 1;
 }
