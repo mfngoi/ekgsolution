@@ -42,6 +42,15 @@ void loop()
     }
 }
 
+void showlist(std::list<int> g)
+{
+    std::list<int>::iterator it;
+    for (it = g.begin(); it != g.end(); ++it)
+    {
+        Serial.println(*it);
+    }
+}
+
 int uploadEKGData(String cmd)
 {
     Serial.println("Running ekg function...");
@@ -63,7 +72,9 @@ int uploadEKGData(String cmd)
         {
             // send the value of analog input 0:
             // Serial.println(analogRead(A0));
-            ekgList.push_back(analogRead(A0));
+            int output = analogRead(A0);            // Particle Boron 3.3v / 4095 units
+            output = (1024*output)/4095;             // Arduino Pro Mini  5v / 1024 units
+            ekgList.push_back(output);
         }
         // Wait for a bit to keep serial data from saturating
         ekgCounter += 1;

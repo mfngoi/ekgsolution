@@ -34,7 +34,9 @@ void loop() {
   }
   else{
     // send the value of analog input 0:
-      Serial.println(analogRead(A0));
+      int output = analogRead(A0);            // Particle Boron 3.3v / 4095 units
+      output = (1024*output)/4095;             // Arduino Pro Mini  5v / 1024 units
+      Serial.println(output);
   }
   //Wait for a bit to keep serial data from saturating
   delay(1);
