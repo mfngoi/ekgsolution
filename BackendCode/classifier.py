@@ -2,3 +2,11 @@ text = "561,529,551,597,615,575,468,408,410,439,463,456,447,460,488,485,464,450,
 
 numberList = text.split(',')
 print(len(numberList))
+
+maxiu = 0
+for x in numberList:
+    number = int(x)
+    if number > maxiu:
+        maxiu = number
+
+print(maxiu)

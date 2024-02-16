@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:test_application/homepage.dart';
-import 'package:test_application/loginpage.dart';
+import 'package:flutter_application/homepage.dart';
+import 'package:flutter_application/loginpage.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 final user = <String, dynamic>{
-  "username": "Bob",
-  "email": "bob@bob.com",
-  "age": 30,
+  "email": "snake.2010@live.com",
+  "sex": "?",
+  "age": 0,
+  "height": 0,
+  "weight": 0,
+  "race": "?",
 };
 
 class SignUpPage extends StatefulWidget {
@@ -18,10 +21,9 @@ class SignUpPage extends StatefulWidget {
 }
 
 class _SignUpPageState extends State<SignUpPage> {
-  // Authentication
   final _emailController = TextEditingController();
-  final _passwordController = TextEditingController();
-  final _confirmPasswordController = TextEditingController();
+  final _passwordController1 = TextEditingController();
+  final _passwordController2 = TextEditingController();
 
   bool obscureValue1 = true;
   bool obscureValue2 = true;
@@ -35,21 +37,6 @@ class _SignUpPageState extends State<SignUpPage> {
     Navigator.of(context)
         .push(MaterialPageRoute(builder: (context) => const LoginInPage()));
   }
-
-  // ============= NOT USED =============
-  // Future<bool> createNewUser(String email, String password) async {
-  //   try {
-  //     final credential =
-  //         await FirebaseAuth.instance.createUserWithEmailAndPassword(
-  //       email: email,
-  //       password: password,
-  //     );
-  //     return true;
-  //   } catch (e) {
-  //     print(e);
-  //     return false;
-  //   }
-  // }
 
   Widget CustomTextField(String hintValue) {
     return Container(
@@ -87,7 +74,7 @@ class _SignUpPageState extends State<SignUpPage> {
       height: 35.0,
       width: 350.0,
       child: TextField(
-        controller: _passwordController,
+        controller: _passwordController1,
         obscureText: obscureValue1,
         decoration: InputDecoration(
           contentPadding: EdgeInsets.all(8.0),
@@ -130,7 +117,7 @@ class _SignUpPageState extends State<SignUpPage> {
       height: 35.0,
       width: 350.0,
       child: TextField(
-        controller: _confirmPasswordController,
+        controller: _passwordController2,
         obscureText: obscureValue2,
         decoration: InputDecoration(
           contentPadding: EdgeInsets.all(8.0),
@@ -168,49 +155,48 @@ class _SignUpPageState extends State<SignUpPage> {
     );
   }
 
+  void SignUp() async {
+    print("Clicked Button");
+    // Create a user account for firebase authentication
+    String email_text = _emailController.text;
+    String password_text = _passwordController2.text;
+    await FirebaseAuth.instance.createUserWithEmailAndPassword(
+      email: email_text,
+      password: password_text,
+    );
+    print("Created Account");
+
+    // Create user information in database
+    final report = <String, dynamic>{
+      "ekg": [200, 300, 400, 500, 600, 700, 800, 500, 400, 300, 400]
+    };
+    final user = <String, dynamic>{
+      "email": _emailController.text,
+      "sex": "?",
+      "age": 0,
+      "height": 0,
+      "weight": 0,
+      "race": "?",
+    };
+    final db = await FirebaseFirestore.instance;
+    await db.collection("users").doc(_emailController.text).set(user);
+    await db
+        .collection("users")
+        .doc(_emailController.text)
+        .collection("reports")
+        .doc()
+        .set(report);
+    print("Created User Data");
+
+    navigateToHomePage();
+  }
+
   Widget SignUpButton() {
     return Container(
       height: 35.0,
       width: 350.0,
       child: ElevatedButton(
-        onPressed: () {
-          try {
-            // Create user in authentication
-            FirebaseAuth.instance
-                .createUserWithEmailAndPassword(
-              email: _emailController.text,
-              password: _passwordController.text,
-            )
-                .then((_) {
-              // Create user in collection
-              final db = FirebaseFirestore.instance;
-              final anotherUser = <String, dynamic>{
-                "email": _emailController.text,
-                "signupdate": Timestamp.now(),
-                "age": null,
-                "sex": null,
-              };
-              db
-                  .collection("users")
-                  .doc(_emailController.text)
-                  .set(anotherUser)
-                  .then((_) {
-                // Create report collection for user
-                db
-                    .collection("users")
-                    .doc(_emailController.text)
-                    .collection("reports")
-                    .doc()
-                    .set(user);
-              });
-
-              print('Successfully created user');
-              navigateToHomePage(); // Navigate to home page
-            });
-          } catch (e) {
-            print(e);
-          }
-        },
+        onPressed: SignUp,
         style: ButtonStyle(
           backgroundColor: MaterialStateProperty.all(
               Colors.black), // Background color of the button
@@ -281,34 +267,22 @@ class _SignUpPageState extends State<SignUpPage> {
               SignUpButton(),
               SizedBox(height: 10),
               Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  Text(
-                    "Have an account?",
-                    style: TextStyle(color: Colors.purple),
-                  ),
-                  TextButton(
-                      onPressed: navigateToLoginPage,
-                      child: Text(
-                        "Log In",
-                        style: TextStyle(
-                            decoration: TextDecoration.underline,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.purple),
-                      )),
-                ],
-              ),
-              TextField(
-                decoration: const InputDecoration(helperText: 'Name'),
-                onSubmitted: (String submittedText) {
-                  final db = FirebaseFirestore.instance;
-                  final name = <String, dynamic>{'name': submittedText};
-                  db.collection('names').add(name).then(
-                      (DocumentReference doc) =>
-                          print('DocumentSnapshot added with ID: ${doc.id}'));
-                  ;
-                },
-              ),
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    Text(
+                      "Have an account?",
+                      style: TextStyle(color: Colors.purple),
+                    ),
+                    TextButton(
+                        onPressed: navigateToLoginPage,
+                        child: Text(
+                          "Log In",
+                          style: TextStyle(
+                              decoration: TextDecoration.underline,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.purple),
+                        )),
+                  ]),
               SizedBox(height: 150),
               Text("We need permission for the service you use. Learn more."),
             ],

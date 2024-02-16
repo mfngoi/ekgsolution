@@ -1,16 +1,9 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
-import 'package:test_application/reportlistpage.dart';
-import 'package:test_application/newspage.dart';
-
-final List<String> imgList = [
-  'https://images.unsplash.com/photo-1520342868574-5fa3804e551c?ixlib=rb-0.3.5&ixid=eyJhcHBfaWQiOjEyMDd9&s=6ff92caffcdd63681a35134a6770ed3b&auto=format&fit=crop&w=1951&q=80',
-  'https://images.unsplash.com/photo-1522205408450-add114ad53fe?ixlib=rb-0.3.5&ixid=eyJhcHBfaWQiOjEyMDd9&s=368f45b0888aeb0b7b08e3a1084d3ede&auto=format&fit=crop&w=1950&q=80',
-  'https://images.unsplash.com/photo-1519125323398-675f0ddb6308?ixlib=rb-0.3.5&ixid=eyJhcHBfaWQiOjEyMDd9&s=94a1e718d89ca60a6337a6008341ca50&auto=format&fit=crop&w=1950&q=80',
-  'https://images.unsplash.com/photo-1523205771623-e0faa4d2813d?ixlib=rb-0.3.5&ixid=eyJhcHBfaWQiOjEyMDd9&s=89719a0d55dd05e2deae4120227e6efc&auto=format&fit=crop&w=1953&q=80',
-  'https://images.unsplash.com/photo-1508704019882-f9cf40e475b4?ixlib=rb-0.3.5&ixid=eyJhcHBfaWQiOjEyMDd9&s=8c6e5e3aba713b17aa1fe71ab4f0ae5b&auto=format&fit=crop&w=1352&q=80',
-  'https://images.unsplash.com/photo-1519985176271-adb1088fa94c?ixlib=rb-0.3.5&ixid=eyJhcHBfaWQiOjEyMDd9&s=a0c8d632e977f94e5d312d9893258f59&auto=format&fit=crop&w=1355&q=80'
-];
+import 'package:flutter_application/reportlistpage.dart';
+import 'package:flutter_application/newspage.dart';
+import 'package:http/http.dart' as http;
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -20,31 +13,67 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  late Future<Map> newsInfo;
+
+  @override
+  void initState() {
+    super.initState();
+    newsInfo = getNewsInfo();
+  }
+
+  Future<Map> getNewsInfo() async {
+    try {
+      String urlLink = "http://10.0.2.2:5000/newsinfo";
+      // Define destination link
+      Uri link = Uri.parse(urlLink);
+
+      // Send the request and get a response back
+      final server_response = await http.get(link);
+
+      final Map<String, dynamic> newsInfo = jsonDecode(server_response.body);
+
+      print(newsInfo);
+
+      return newsInfo;
+    } catch (e) {
+      print('error caught: $e');
+    }
+
+    return {};
+  }
+
+  Future<String> triggerDevice() async {
+    http.post(Uri.parse(
+        'https://api.particle.io/v1/devices/e00fce684219e0e249d5bc42/readECG?access_token=40c9617030f65832904eb99528de3da5e7ebfe66'));
+    return "Sent Request";
+  }
+
   void navigateToReportPage() {
     Navigator.of(context)
         .push(MaterialPageRoute(builder: (context) => const ReportListPage()));
   }
 
-  void navigateToNewsPage(int newsIndex) {
-    Navigator.of(context).push(MaterialPageRoute(
-        builder: (context) =>
-            NewsPage(index: newsIndex, imageLink: imgList[newsIndex])));
+  void navigateToNewsPage(Map<String, dynamic> newsData) {
+    Navigator.of(context).push(
+        MaterialPageRoute(builder: (context) => NewsPage(newsData: newsData)));
   }
 
-  List<Widget> CreateImageSlides(List<String> imgList) {
-    List<Widget> imageSlides = [];
-    for (int i = 0; i < imgList.length; i++) {
-      Widget imageCard = CustomGestureDetector(imgList, i);
-      imageSlides.add(imageCard);
-    }
+  // List<Widget> CreateImageSlides(List<String> imgList) {
+  //   List<Widget> imageSlides = [];
+  //   for (int i = 0; i < imgList.length; i++) {
+  //     Widget imageCard = CustomGestureDetector(imgList, i);
+  //     imageSlides.add(imageCard);
+  //   }
 
-    return imageSlides;
-  }
+  //   return imageSlides;
+  // }
 
-  Widget CustomGestureDetector(List<String> imgList, int index) {
+  Widget CustomGestureDetector(Map<String, dynamic> newsData) {
+    // FUTURE -> should accept title and content as well
     return GestureDetector(
       onTap: () {
-        navigateToNewsPage(index);
+        navigateToNewsPage(
+            newsData); // FUTURE -> should accept title and content
       },
       child: Container(
         child: Container(
@@ -54,34 +83,8 @@ class _HomePageState extends State<HomePage> {
             child: Stack(
               fit: StackFit.expand,
               children: <Widget>[
-                Image.network(imgList[index], fit: BoxFit.cover, width: 1000.0),
-                // Positioned(
-                //   bottom: 0.0,
-                //   left: 0.0,
-                //   right: 0.0,
-                //   child: Container(
-                //     decoration: BoxDecoration(
-                //       gradient: LinearGradient(
-                //         colors: [
-                //           Color.fromARGB(200, 0, 0, 0),
-                //           Color.fromARGB(0, 0, 0, 0)
-                //         ],
-                //         begin: Alignment.bottomCenter,
-                //         end: Alignment.topCenter,
-                //       ),
-                //     ),
-                //     padding: EdgeInsets.symmetric(
-                //         vertical: 10.0, horizontal: 20.0),
-                //     child: Text(
-                //       'No. ${imgList.indexOf(item)} image',
-                //       style: TextStyle(
-                //         color: Colors.white,
-                //         fontSize: 20.0,
-                //         fontWeight: FontWeight.bold,
-                //       ),
-                //     ),
-                //   ),
-                // ),
+                Image.network(newsData["image"]!,
+                    fit: BoxFit.cover, width: 1000.0),
               ],
             ),
           ),
@@ -106,7 +109,7 @@ class _HomePageState extends State<HomePage> {
           backgroundColor: MaterialStateProperty.all<Color>(Colors.purple),
           foregroundColor: MaterialStateProperty.all<Color>(Colors.white),
         ),
-        onPressed: null,
+        onPressed: triggerDevice,
         child: Text(
           "Diagnoze Now",
           textAlign: TextAlign.center,
@@ -140,7 +143,9 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget NewsCarousel() {
+  // Modify NewsCarousel to accept "items"
+  Widget NewsCarousel(List<Widget> newsCards) {
+    // FUTURE
     return Container(
       child: CarouselSlider(
         options: CarouselOptions(
@@ -149,8 +154,29 @@ class _HomePageState extends State<HomePage> {
           aspectRatio: 2.0,
           enlargeCenterPage: true,
         ),
-        items: CreateImageSlides(imgList),
+        items: newsCards,
       ),
+    );
+  }
+
+  Widget NewsSection() {
+    return FutureBuilder(
+      future: newsInfo,
+      builder: (context, snapshot) {
+        if (snapshot.hasData) {
+          Map newsInfo = snapshot.data as Map;
+
+          final List news = newsInfo.keys.toList();
+          List<Widget> newsCards = [];
+          for (int i = 0; i < news.length; i++) {
+            newsCards.add(CustomGestureDetector(newsInfo[news[i]]));
+          }
+
+          return NewsCarousel(newsCards);
+        } else {
+          return Text("Unable to get news from server...");
+        }
+      },
     );
   }
 
@@ -174,7 +200,7 @@ class _HomePageState extends State<HomePage> {
             SizedBox(height: 20),
             CheckReport(),
             SizedBox(height: 70),
-            NewsCarousel(),
+            NewsSection(),
           ],
         ),
       ),

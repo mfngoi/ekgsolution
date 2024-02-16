@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:test_application/reportpage.dart';
+import 'package:flutter_application/reportpage.dart';
 
 class ReportListPage extends StatefulWidget {
   const ReportListPage({super.key});
@@ -121,6 +121,10 @@ class _ReportListPageState extends State<ReportListPage> {
           children: <Widget>[
             SizedBox(height: 20),
             TopWindow(),
+            Container(
+              height: 20,
+              color: Colors.purple,
+            ),
             ReportList(),
           ],
         ),

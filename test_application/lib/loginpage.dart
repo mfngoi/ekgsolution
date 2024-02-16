@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:test_application/signuppage.dart';
-import 'package:test_application/homepage.dart';
+import 'package:flutter_application/signuppage.dart';
+import 'package:flutter_application/homepage.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 class LoginInPage extends StatefulWidget {
@@ -11,8 +11,6 @@ class LoginInPage extends StatefulWidget {
 }
 
 class _LoginInPageState extends State<LoginInPage> {
-  // Authentication
-  bool _loginError = false;
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
 
@@ -27,17 +25,6 @@ class _LoginInPageState extends State<LoginInPage> {
   void navigateToHomePage() {
     Navigator.of(context)
         .push(MaterialPageRoute(builder: (context) => const HomePage()));
-  }
-
-  Future<bool> signIn(String email, String password) async {
-    try {
-      final credential = await FirebaseAuth.instance
-          .signInWithEmailAndPassword(email: email, password: password);
-      return true;
-    } on FirebaseAuthException catch (e) {
-      print(e);
-      return false;
-    }
   }
 
   Widget CustomTextField(String hintValue) {
@@ -120,15 +107,13 @@ class _LoginInPageState extends State<LoginInPage> {
       width: 350.0,
       child: ElevatedButton(
         onPressed: () {
-          signIn(_emailController.text, _passwordController.text)
-              .then((bool success) {
-            if (success) {
-              print('Successfully signed in');
-              navigateToHomePage(); // Enter homepage if successful
-            }
-            setState(() {
-              _loginError = !success;
-            });
+          FirebaseAuth.instance
+              .signInWithEmailAndPassword(
+            email: _emailController.text,
+            password: _passwordController.text,
+          )
+              .then((_) {
+            navigateToHomePage();
           });
         },
         style: ButtonStyle(
@@ -186,7 +171,6 @@ class _LoginInPageState extends State<LoginInPage> {
             CustomTextField("Username, Email, or Phone Number"),
             SizedBox(height: 10),
             CustomPasswordField("Password"),
-            _loginError ? const Text('Invalid login information') : Container(),
             SizedBox(height: 10),
             Container(
               width: 350.0,
@@ -226,7 +210,7 @@ class _LoginInPageState extends State<LoginInPage> {
             ),
             SizedBox(height: 50),
             LoginButton(),
-            SizedBox(height: 200),
+            SizedBox(height: 270),
             Row(mainAxisAlignment: MainAxisAlignment.center, children: <Widget>[
               Text(
                 "Don't have an account?",
