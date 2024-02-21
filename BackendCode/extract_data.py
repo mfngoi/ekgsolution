@@ -2,7 +2,7 @@ import wfdb
 import numpy as np
 from IPython.display import display
 
-sig, fields = wfdb.rdsamp('ecg_data/raw/1001/0b61746e-c5f4-4b54-8baa-4404c22e09b5')
+sig, fields = wfdb.rdsamp('ecg_data/raw/1001/00ed2097-cd14-4f03-ab33-853da5be5550')
 
 # https://pypi.org/project/wfdb/0.1.2/
 # https://numpy.org/doc/stable/user/quickstart.html

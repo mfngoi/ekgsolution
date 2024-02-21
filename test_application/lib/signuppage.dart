@@ -1,17 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_application/homepage.dart';
-import 'package:flutter_application/loginpage.dart';
+import 'package:test_application/homepage.dart';
+import 'package:test_application/loginpage.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-
-final user = <String, dynamic>{
-  "email": "snake.2010@live.com",
-  "sex": "?",
-  "age": 0,
-  "height": 0,
-  "weight": 0,
-  "race": "?",
-};
 
 class SignUpPage extends StatefulWidget {
   const SignUpPage({super.key});
@@ -178,14 +169,19 @@ class _SignUpPageState extends State<SignUpPage> {
       "weight": 0,
       "race": "?",
     };
-    final db = await FirebaseFirestore.instance;
-    await db.collection("users").doc(_emailController.text).set(user);
+
+    final db = await FirebaseFirestore.instance; // Connect to database
+
+    await db
+        .collection("users")
+        .doc(_emailController.text)
+        .set(user); // Add user info to database
     await db
         .collection("users")
         .doc(_emailController.text)
         .collection("reports")
         .doc()
-        .set(report);
+        .set(report); // Add dummy ekg report into database
     print("Created User Data");
 
     navigateToHomePage();

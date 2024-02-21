@@ -42,15 +42,6 @@ void loop()
     }
 }
 
-void showlist(std::list<int> g)
-{
-    std::list<int>::iterator it;
-    for (it = g.begin(); it != g.end(); ++it)
-    {
-        Serial.println(*it);
-    }
-}
-
 int uploadEKGData(String cmd)
 {
     Serial.println("Running ekg function...");

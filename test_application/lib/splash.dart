@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:flutter_application/signuppage.dart';
+import 'package:test_application/signuppage.dart';
 
 class Splash extends StatefulWidget {
   const Splash({super.key});

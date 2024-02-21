@@ -39,7 +39,7 @@ class _NewsPageState extends State<NewsPage> {
               Padding(
                 padding: EdgeInsets.only(left: 20.0, bottom: 10.0),
                 child: Text(
-                  widget.newsData["title"]!,
+                  widget.newsData["article_title"]!,
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: 35.0,
@@ -76,7 +76,7 @@ class _NewsPageState extends State<NewsPage> {
           padding: EdgeInsets.only(top: 10),
           children: <Widget>[
             Text(
-              widget.newsData["content"]!,
+              widget.newsData["article_content"]!,
               textAlign: TextAlign.left,
               style: TextStyle(
                 color: Colors.black,

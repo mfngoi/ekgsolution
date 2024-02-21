@@ -1,8 +1,8 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
-import 'package:flutter_application/reportlistpage.dart';
-import 'package:flutter_application/newspage.dart';
+import 'package:test_application/reportlistpage.dart';
+import 'package:test_application/newspage.dart';
 import 'package:http/http.dart' as http;
 
 class HomePage extends StatefulWidget {

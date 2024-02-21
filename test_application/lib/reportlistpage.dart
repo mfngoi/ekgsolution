@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_application/reportpage.dart';
+import 'package:test_application/reportpage.dart';
 
 class ReportListPage extends StatefulWidget {
   const ReportListPage({super.key});
