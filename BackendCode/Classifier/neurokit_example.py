@@ -5,7 +5,7 @@ import numpy as np
 
 # Get 10,000 reading sample from file
 input_data = []
-with open("heart_samples/heartsample_5v_01.log", 'r') as file:
+with open("target/heartsample_5v_01.log", 'r') as file:
     while len(input_data) < 10000:
         line = file.readline().strip()
         if line.isdigit():

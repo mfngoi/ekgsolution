@@ -1,6 +1,4 @@
 from sklearn import svm
-from sklearn.preprocessing import LabelEncoder
-import pandas as pd
 import pickle
 
 # Load model
@@ -24,8 +22,10 @@ with open("target/heartsample_5v_01.log", 'r') as file:
 # print(input_data)
 # print(len(input_data))
         
-answer = ekgClassifier.predict([input_data])
+# Ask model to predict our input_data
+prediction = ekgClassifier.predict([input_data])
+print(prediction)   # Numerical value
 
-print(answer)
-answer_decoded = encoder.inverse_transform(answer)
-print(answer_decoded)
+# Decode the prediction
+decoded_prediction = encoder.inverse_transform(prediction)
+print(decoded_prediction)
