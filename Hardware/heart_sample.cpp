@@ -70,5 +70,4 @@ int uploadEKGData(String cmd) {
     Serial.println("Amount of Readings: ");
     Serial.println(ekgCounter);
     return 1;
-
 }
