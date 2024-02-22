@@ -1,5 +1,8 @@
-/BackendCode/venv
-/BackendCode/__pycache__
-/BackendCode/ecg_data
+BackendCode/venv
+BackendCode/__pycache__
+BackendCode/ecg_data
+BackendCode/model.pkl
+BackendCode/encoder.pkl
+BackendCode/Classifier/compiled_dataset.csv
 
-/particle_boron
+particle_boron
