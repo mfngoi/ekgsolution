@@ -5,7 +5,7 @@ BackendCode/Classifier/compiled_dataset.csv
 .vscode/
 particle_boron/
 .DS_Store
-target/ekgClassifier.pkl
-target/encoder.pkl
-target/compiled_dataset.csv
+BackendCode/target/ekgClassifier.pkl
+BackendCode/target/encoder.pkl
+BackendCode/target/compiled_dataset.csv
 
