@@ -1,10 +1,13 @@
+
 BackendCode/venv/
 BackendCode/__pycache__/
 BackendCode/ecg_data
 BackendCode/Classifier/compiled_dataset.csv
-.vscode/
-.DS_Store
 BackendCode/target/ekgClassifier.pkl
 BackendCode/target/encoder.pkl
 BackendCode/target/compiled_dataset.csv
+
+.vscode/
+.DS_Store
+
 
