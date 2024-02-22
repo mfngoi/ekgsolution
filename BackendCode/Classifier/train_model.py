@@ -2,10 +2,9 @@ from sklearn import svm
 from sklearn.preprocessing import LabelEncoder
 import pandas as pd
 import pickle
-import os
 
 # Load data from compiled csv
-file_content = pd.read_csv('Classifier/compiled_dataset.csv', index_col=[0])
+file_content = pd.read_csv('target/compiled_dataset.csv', index_col=[0])
 print(file_content)
 
 # Extract ecg readings as training data
@@ -26,16 +25,16 @@ training_label_encoded = encoder.fit_transform(training_label_df)
 print(training_label_encoded)
 
 # Save encoder to disk
-with open('encoder.pkl', 'wb') as f:
+with open('target/encoder.pkl', 'wb') as f:
     pickle.dump(encoder, f)
 print("Saved encoder to disk... ")
 
 # Select algorithm and load data for training
-model = svm.SVC()
-model.fit(training_data, training_label_encoded) # Training
+ekgClassifier = svm.SVC()
+ekgClassifier.fit(training_data, training_label_encoded) # Training
 print("Training Completed... ")
 
 # Save trained model to disk
-with open('model.pkl', 'wb') as f:
-    pickle.dump(model, f)
+with open('target/ekgClassifier.pkl', 'wb') as f:
+    pickle.dump(ekgClassifier, f)
 print("Saved model to disk... ")
