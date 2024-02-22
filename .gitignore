@@ -1,9 +1,11 @@
 BackendCode/venv/
 BackendCode/__pycache__/
 BackendCode/ecg_data
-BackendCode/model.pkl
-BackendCode/encoder.pkl
 BackendCode/Classifier/compiled_dataset.csv
 .vscode/
 particle_boron/
+.DS_Store
+target/ekgClassifier.pkl
+target/encoder.pkl
+target/compiled_dataset.csv
 
