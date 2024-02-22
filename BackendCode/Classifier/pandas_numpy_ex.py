@@ -18,7 +18,6 @@ import wfdb
 my_numpy = np.arange(24).reshape(6, 4)
 print(my_numpy)
 print()
-print()
 print(my_numpy[0:5, 2])
 # np.zeros((3,4))
 # np.arange(15).reshape(5, 3)
