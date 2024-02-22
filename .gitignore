@@ -3,7 +3,6 @@ BackendCode/__pycache__/
 BackendCode/ecg_data
 BackendCode/Classifier/compiled_dataset.csv
 .vscode/
-particle_boron/
 .DS_Store
 BackendCode/target/ekgClassifier.pkl
 BackendCode/target/encoder.pkl
