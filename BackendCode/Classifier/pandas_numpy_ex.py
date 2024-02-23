@@ -45,12 +45,15 @@ print(numpie_combined)
 # csv = pd.read_csv('../ecg_data/SCR-002.Clinical.Data.csv', index_col=[0])
 # print(csv)
 
-# # Creating a dataframe
+# Creating a dataframe
 # my_dataframe = pd.DataFrame(sig)
 # print(my_dataframe)
+my_panda = pd.DataFrame(data=np.random.randn(3,4))
+my_panda.columns = ['A','B','C','D']
+print(my_panda)
 
-# # Indexing and slicing
+# Indexing and slicing
 
-# # Concat and merge
+# Concat and merge
 
 # my_dataframe.to_csv('myDataframe.csv')

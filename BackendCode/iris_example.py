@@ -1,7 +1,7 @@
 from sklearn import svm
 
 training_data = [
-    [5.0, 3.4, 1.5, 0.2], # Setosa
+    [5.0, 3.4, 1.5, 0.2], # Setosa  [sex, age, height, weight, race, pr_interval, qt_interval, p_wave_area]
     [4.4, 2.9, 1.4, 0.2], # Setosa
     [4.3, 3.0, 1.1, 0.1], # Setosa
     [5.5, 2.4, 3.7, 1.0], # Versicolor
