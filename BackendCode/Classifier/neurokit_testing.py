@@ -21,10 +21,13 @@ print(input_data_np)
 
 # Process ecg
 ecg_signals, info = nk.ecg_process(input_data_np, sampling_rate=1000)
-# print(ecg_signals)
-# print(info)
+print(ecg_signals)
+# print(ecg_signals.columns)
+# ecg_signals['ECG_P_Offsets'].to_csv('hello.csv')
+# print(ecg_signals['ECG_P_Offsets'])
+print(info)
 
-# Examine plot (Displays ecg analysis overview)
+# Examine plot (Displays ecg analysis overview)s
 nk.ecg_plot(ecg_signals, info)
 
 # Segments each heart beat from our ecg_signals
@@ -48,5 +51,7 @@ print("mean_heartbeat")
 print("=================================")
 print(mean_heartbeat)
 print()
+
+mean_heartbeat.plot()
 
 plt.show()
