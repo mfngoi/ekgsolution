@@ -7,6 +7,9 @@ from sklearn.preprocessing import LabelEncoder
 file_content = pd.read_csv('target/compiled_dataset.csv')
 print(file_content)
 
+# CONSTANTS
+ROWS = file_content.shape[0]    # 5232
+
 # Extract ecg readings as training data
 training_data_df = file_content.iloc[:, 32:10033]   # Extract ekg data
 print(training_data_df)
@@ -15,15 +18,16 @@ print(training_data_df)
 training_data_np = training_data_df.to_numpy()
 print(training_data_np)
 
+# Create the columns or characteristics you want to track
 condition_col = file_content['EXTRT']
 sex_col = file_content['SEX']
 age_col = file_content['AGE']
 height_col = file_content['HGHT']
 width_col = file_content['WGHT']
 ethnicity_col = file_content['RACE']
-# r_peak_col = np.random.randn(5232)       # How to retrieve the average rpeak
-# pr_int_col = np.random.randn(5232)
-
+r_peak_col = np.zeros(ROWS)             # How to process r_peak values from training data_np? 
+pr_int_col = np.zeros(ROWS)
+pr_seg_col = np.zeros(ROWS)
 
 # Encode any columns that are not numeric
 condition_col = LabelEncoder().fit_transform(condition_col)

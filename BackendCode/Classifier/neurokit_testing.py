@@ -41,7 +41,8 @@ df = epochs_to_df(heartbeats)
 
 # Get main signal column name
 # Selects either "Signal", "ECG_Raw", or "ECG_Clean" column to average
-col = [c for c in ["Signal", "ECG_Raw", "ECG_Clean"] if c in df.columns][-1]
+# col = [c for c in ["Signal", "ECG_Raw", "ECG_Clean"] if c in df.columns][-1]
+col = "ECG_Clean"
 print(col)
 
 # Calculate average heartbeat
@@ -51,6 +52,15 @@ print("mean_heartbeat")
 print("=================================")
 print(mean_heartbeat)
 print()
+
+np_mean_heartbeat = mean_heartbeat["ECG_Clean"].to_numpy()
+np_mean_heartbeat = np.hstack((np_mean_heartbeat, np.zeros(400)))
+
+print(np_mean_heartbeat.shape)
+instant_peaks, info = nk.ecg_peaks(ecg_cleaned=np_mean_heartbeat, sampling_rate=1000)
+print(instant_peaks)
+print(info)
+# instant_peaks.to_csv('target/instant_peaks.csv')
 
 mean_heartbeat.plot()
 
