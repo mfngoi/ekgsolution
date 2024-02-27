@@ -2,6 +2,7 @@ import pandas as pd
 import numpy as np
 import neurokit2 as nk
 import matplotlib.pyplot as plt
+import math
 from sklearn.preprocessing import LabelEncoder
 
 # Load data from compiled csv
@@ -10,7 +11,7 @@ print(file_content)
 
 # CONSTANTS
 # ROWS = file_content.shape[0]    # 5232
-ROWS = 10
+ROWS = 5
 
 # Extract ecg readings as training data
 training_data_df = file_content.iloc[:ROWS, 32:10033]   # Extract ekg data
@@ -21,9 +22,9 @@ training_data_np = training_data_df.to_numpy()
 print(training_data_np)
 
 # Process training data for r peaks specifically
-def avg_all_r_peaks(np_2d_matrix):
+def avg_all_pr_interval(np_2d_matrix):
     
-    r_peak_col = []
+    pr_interval_col = []
 
     for i in range(ROWS):
 
@@ -31,21 +32,27 @@ def avg_all_r_peaks(np_2d_matrix):
         signals, info = nk.ecg_process(np_2d_matrix[i,:], sampling_rate=1000)
         # print(signals)    # Raw and cleaned readings
         # print(info)       # Give indexes of peaks, onsets, and offsets of PQRST waves
+        # print(info.keys())
 
-        # Find values of r_peaks indexes
-        # print(info['ECG_R_Peaks']) # Give index of r_peaks
-        r_peak_values = []
-        for r_index in info['ECG_R_Peaks']:
-            r_value = signals['ECG_Clean'][r_index]     # Retrieve value of cleaned ecg signal from index
-            r_peak_values.append(r_value)
-        # print(r_peak_values)
+        print()
+        print('P_Onsets', info['ECG_P_Onsets'])
+        print('R_Onsets', info['ECG_R_Onsets'])
 
+        # Find values of all pr_intervals in reading
+        pr_interval_values = []
+        for beat in range(len(info['ECG_P_Onsets'])):
+            p_onset = info['ECG_P_Onsets'][beat]
+            r_onset = info['ECG_R_Onsets'][beat]
+            if not math.isnan(p_onset) and not math.isnan(r_onset):
+                pr_interval_values.append(r_onset - p_onset)
+        print(pr_interval_values)
+            
         # Calculate and save average
-        total = round(sum(r_peak_values), 6)
-        average = round(total/len(r_peak_values), 6)
-        r_peak_col.append(average)
+        total = sum(pr_interval_values)
+        average = round(total/len(pr_interval_values))
+        pr_interval_col.append(average)        
 
-    return r_peak_col
+    return pr_interval_col
 
 def average_heartbeat(signal_array):
 
@@ -63,10 +70,9 @@ def average_heartbeat(signal_array):
 
     return mean_heartbeat
 
+def pr_interval_avg_hb(np_2d_matrix):
 
-def r_peak_avg_hb(np_2d_matrix):
-
-    r_peak_col = []
+    pr_interval_col = []
 
     for i in range(ROWS):
 
@@ -75,11 +81,10 @@ def r_peak_avg_hb(np_2d_matrix):
         # pd.Series(avg_heartbeat).plot()
         # plt.show()
 
-        r_peak_col.append(max(avg_heartbeat))
+        # Tried to use ecg_delineate() but unable to function properly
+        pr_interval_col.append(0)
 
-    return r_peak_col
-
-
+    return pr_interval_col
 
 # Create the columns or characteristics you want to track
 condition_col = file_content['EXTRT'][:ROWS]
@@ -88,9 +93,10 @@ age_col = file_content['AGE'][:ROWS]
 height_col = file_content['HGHT'][:ROWS]
 width_col = file_content['WGHT'][:ROWS]
 ethnicity_col = file_content['RACE'][:ROWS]
-avg_all_r_peaks_col = avg_all_r_peaks(training_data_np)
-r_peak_avg_hb_col = r_peak_avg_hb(training_data_np)
-pr_int_col = np.zeros(ROWS)
+avg_all_r_peaks_col = np.zeros(ROWS)
+r_peak_avg_hb_col = np.zeros(ROWS)
+avg_all_pr_int_col = avg_all_pr_interval(training_data_np)
+pr_int_avg_hb_col = pr_interval_avg_hb(training_data_np)
 pr_seg_col = np.zeros(ROWS)
 
 
@@ -108,8 +114,8 @@ processed_dataset = pd.DataFrame(
         'ETHNICITY': ethnicity_col,
         'AVG_ALL_R_PEAK': avg_all_r_peaks_col,               # Should contain the average rpeak of a 10 sec period
         'R_PEAK_OF_AVG_HEART': r_peak_avg_hb_col,
-        'PR_INT': pr_int_col,
-        'PR_SEGMENT': pr_seg_col,
+        'AVG_ALL_PR_INTERVAL': avg_all_pr_int_col,
+        'PR_INTERVAL_AVG_HEART': pr_int_avg_hb_col,
     }
 )
 
