@@ -110,7 +110,7 @@ processed_dataset = pd.DataFrame(
         'SEX': sex_col,
         'AGE': age_col,
         'HEIGHT': height_col,
-        'WIDTH': width_col,
+        'WEIGHT': width_col,
         'ETHNICITY': ethnicity_col,
         'AVG_ALL_R_PEAK': avg_all_r_peaks_col,               # Should contain the average rpeak of a 10 sec period
         'R_PEAK_OF_AVG_HEART': r_peak_avg_hb_col,

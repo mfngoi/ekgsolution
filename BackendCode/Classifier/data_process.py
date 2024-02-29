@@ -39,7 +39,7 @@ processed_dataset = pd.DataFrame(
         'SEX': sex_col,
         'AGE': age_col,
         'HEIGHT': height_col,
-        'WIDTH': width_col,
+        'WEIGHT': width_col,
         'ETHNICITY': ethnicity_col,
         'R_PEAK': r_peak_col,         # Should contain the average rpeak of a 10 sec period
         'PR_INT': pr_int_col,
