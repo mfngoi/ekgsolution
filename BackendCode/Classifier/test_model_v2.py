@@ -5,8 +5,8 @@ import pickle
 from csv_process import avg_r_peak_reading, avg_pr_interval_reading, avg_qt_interval_reading
 
 # Load model
-with open('target/ekgClassifier.pkl', 'rb') as f:
-    ekgClassifier = pickle.load(f)
+with open('target/ecgClassifier.pkl', 'rb') as f:
+    ecgClassifier = pickle.load(f)
 
 # Load label encoders
 with open('target/condition_encoder.pkl', 'rb') as f:
@@ -38,7 +38,7 @@ input_data_np = np.asarray(input_data)
 signals, info = nk.ecg_process(input_data_np, sampling_rate=1000)
 
 # ECG Characteristics
-avg_r_peak = avg_r_peak_reading(signals, info)
+# avg_r_peak = avg_r_peak_reading(signals, info)
 avg_pr_interval = avg_pr_interval_reading(signals, info)
 avg_qt_interval = avg_qt_interval_reading(signals, info)
 
@@ -73,9 +73,9 @@ print(my_dataframe)
         
 # Ask model to predict our input_data
 my_data = my_dataframe.to_numpy()
-prediction = ekgClassifier.predict(my_data)
-print(f"{prediction}")   # Numerical value
+condition_encoded = ecgClassifier.predict(my_data)
+print(f"{condition_encoded}")   # Numerical value
 
 # Decode the prediction
-decoded_prediction = condition_encoder.inverse_transform(prediction)
-print(f"{decoded_prediction}")
+condition = condition_encoder.inverse_transform(condition_encoded)
+print(f"{condition}")

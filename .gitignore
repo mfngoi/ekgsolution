@@ -5,7 +5,7 @@ BackendCode/Classifier/__pycache__/
 
 BackendCode/ecg_data
 
-BackendCode/target/ekgClassifier.pkl
+BackendCode/target/ecgClassifier.pkl
 BackendCode/target/encoder.pkl
 BackendCode/target/condition_encoder.pkl
 BackendCode/target/ethnicity_encoder.pkl

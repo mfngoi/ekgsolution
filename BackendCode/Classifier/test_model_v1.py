@@ -2,8 +2,8 @@ from sklearn import svm
 import pickle
 
 # Load model
-with open('target/ekgClassifier.pkl', 'rb') as f:
-    ekgClassifier = pickle.load(f)
+with open('target/ecgClassifier.pkl', 'rb') as f:
+    ecgClassifier = pickle.load(f)
 
 # Load label encoder
 with open('target/encoder.pkl', 'rb') as f:
@@ -23,7 +23,7 @@ with open("target/heartsample_5v_01.log", 'r') as file:
 # print(len(input_data))
         
 # Ask model to predict our input_data
-prediction = ekgClassifier.predict([input_data])
+prediction = ecgClassifier.predict([input_data])
 print(prediction)   # Numerical value
 
 # Decode the prediction

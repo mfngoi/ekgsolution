@@ -30,11 +30,11 @@ with open('target/encoder.pkl', 'wb') as f:
 print("Saved encoder to disk... ")
 
 # Select algorithm and load data for training
-ekgClassifier = svm.SVC()
-ekgClassifier.fit(training_data, training_label_encoded) # Training
+ecgClassifier = svm.SVC()
+ecgClassifier.fit(training_data, training_label_encoded) # Training
 print("Training Completed... ")
 
 # Save trained model to disk
-with open('target/ekgClassifier.pkl', 'wb') as f:
-    pickle.dump(ekgClassifier, f)
+with open('target/ecgClassifier.pkl', 'wb') as f:
+    pickle.dump(ecgClassifier, f)
 print("Saved model to disk... ")
