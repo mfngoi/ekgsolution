@@ -59,12 +59,19 @@ def avg_qt_interval_reading(signals, info):
 # will return a type of condition or a normal condition
 def ecgClassify(profile, ecg_signals, model, encoders):
 
-    # Process input data     
-    input_data_np = np.asarray(ecg_signals)
+    # Format signal into numpy array    
+    input_data_np = np.asarray(ecg_signals, dtype=np.float64)       # convert to type float64
+    # print(f"{input_data_np=}")
+    # print(f"{input_data_np.shape=}")
+    # print(f"{input_data_np.dtype=}")
+
+    # input_data_np = input_data_np / 4095        # normalize unit
+
+    # Process signal / input_data using neurokit2
     signals, info = nk.ecg_process(input_data_np, sampling_rate=1000)
 
     # ECG Characteristics
-    avg_r_peak = avg_r_peak_reading(signals, info)
+    # avg_r_peak = avg_r_peak_reading(signals, info)
     avg_pr_interval = avg_pr_interval_reading(signals, info)
     avg_qt_interval = avg_qt_interval_reading(signals, info)
 
@@ -78,15 +85,16 @@ def ecgClassify(profile, ecg_signals, model, encoders):
 
     # Encode or numerize columns
     # condition = condition_encoder.transform(condition)
-    sex = encoders['sex'].transform(sex)
-    ethnicity = encoders['ethnicity'].transform(ethnicity)
+    sex = encoders['sex'].transform([sex])[0]
+    ethnicity = encoders['ethnicity'].transform([ethnicity])[0]
 
     # Create numpy array for input
-    my_data = np.asarray([sex, age, height, weight, ethnicity, avg_r_peak, avg_pr_interval, avg_qt_interval])
+    # my_data = np.asarray([sex, age, height, weight, ethnicity, avg_r_peak, avg_pr_interval, avg_qt_interval])
+    my_data = np.asarray([sex, age, height, weight, ethnicity, avg_pr_interval, avg_qt_interval])
     # print(f"{my_data}")
             
     # Get prediction
-    condition_encoded = model.predict(my_data)
+    condition_encoded = model.predict([my_data])
     condition = encoders['condition'].inverse_transform(condition_encoded)[0]    # Decode and extract from array
     
     return condition

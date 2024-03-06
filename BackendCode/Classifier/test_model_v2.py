@@ -24,7 +24,7 @@ with open("target/heartsample_5v_01.log", 'r') as file:
         line = file.readline().strip()
         if line.isdigit():
             reading = int(line)
-            # reading = int(line) / 4095          # normalize unit
+            reading = int(line) / 4095          # normalize unit
             input_data.append(reading) 
         if line == "":
             break
@@ -33,8 +33,11 @@ print(f"Minimum: {min(input_data)}")
 print(f"Average: {sum(input_data)/len(input_data)}")
 
 
+
 # Process input data     
 input_data_np = np.asarray(input_data)
+print(f"{input_data_np.shape=}")
+print(f"{input_data_np.dtype=}")
 signals, info = nk.ecg_process(input_data_np, sampling_rate=1000)
 
 # ECG Characteristics

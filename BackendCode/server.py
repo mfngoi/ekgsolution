@@ -1,5 +1,6 @@
 import flask
 import pickle
+import json
 from flask import request
 from news_data import news_data
 from ecgclassifier import ecgClassify
@@ -43,17 +44,28 @@ def newsInfo():
 
 @app.route("/ekgclassify", methods=['POST'])
 def ekgClassify():
-    value = request.body
-    print(f"{value}")
+    value = request.form
+    # print(f"{value}")
 
-    profile = request.body['profile']
-    ecg_signals = request.body['signals']
+    # Handling profile
+    profile = request.form['profile'] # Extract contents of profile key
+    # print(f"{profile=}")
+    profile = json.loads(profile)   # Convert string to python dictionary
+    # print(f"{profile['sex']}")
+    # print(f"{profile['age']}")
+    # print(f"{profile['ethnicity']}")
+
+    # Handling signals
+    ecg_signals = request.form['signals']
+    ecg_signals = ecg_signals.split(', ')
+    # print(f"{ecg_signals=}")
 
     # Get condition in result
     result = ecgClassify(profile, ecg_signals, ecgClassifier, encoders)
     print(f"{result}")
     
-    return "success"
+    return result
 
 if __name__ == '__main__': # Runs app when the program is started
-    app.run(debug=True)
+    app.run(host='0.0.0.0', debug=True)
+
