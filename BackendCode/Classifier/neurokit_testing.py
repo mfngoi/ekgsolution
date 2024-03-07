@@ -7,7 +7,7 @@ import numpy as np
 
 # Get 10,000 reading sample from file
 input_data = []
-with open("target/heartsample_5v_01.log", 'r') as file:
+with open("target/heartsample_5v_03.log", 'r') as file:
     while len(input_data) < 10000:
         line = file.readline().strip()
         if line.isdigit():
@@ -54,8 +54,10 @@ print(col)
 
 # Calculate average heartbeat
 mean_heartbeat = df.groupby("Time")[[col]].mean()
-print(f"{mean_heartbeat=}")
-mean_heartbeat.to_csv("target/mean_heartbeat.csv")
+# print(f"{mean_heartbeat=}")
+mean_hb = mean_heartbeat["ECG_Clean"].tolist()
+print(f"{mean_hb=}")
+# mean_heartbeat.to_csv("target/mean_heartbeat.csv", columns=["ECG_Clean"], index=False)
 mean_heartbeat.plot()
 
 # np_mean_heartbeat = mean_heartbeat["ECG_Clean"].to_numpy()

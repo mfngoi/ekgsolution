@@ -3,7 +3,8 @@ BackendCode/venv/
 BackendCode/__pycache__/
 BackendCode/Classifier/__pycache__/
 
-BackendCode/ecg_data
+BackendCode/ecg_data/
+BackendCode/reportdata.txt
 
 BackendCode/target/ecgClassifier.pkl
 BackendCode/target/encoder.pkl
