@@ -3,10 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:test_application/reportlistpage.dart';
 import 'package:test_application/newspage.dart';
+import 'package:test_application/profilepage.dart';
 import 'package:http/http.dart' as http;
 
 class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+  final String user_email;
+  const HomePage({super.key, required this.user_email});
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -23,7 +25,7 @@ class _HomePageState extends State<HomePage> {
 
   Future<Map> getNewsInfo() async {
     try {
-      String urlLink = "http://10.0.2.2:5000/newsinfo";
+      String urlLink = "http://localhost:5000/newsinfo";
       // Define destination link
       Uri link = Uri.parse(urlLink);
 
@@ -58,15 +60,9 @@ class _HomePageState extends State<HomePage> {
         MaterialPageRoute(builder: (context) => NewsPage(newsData: newsData)));
   }
 
-  // List<Widget> CreateImageSlides(List<String> imgList) {
-  //   List<Widget> imageSlides = [];
-  //   for (int i = 0; i < imgList.length; i++) {
-  //     Widget imageCard = CustomGestureDetector(imgList, i);
-  //     imageSlides.add(imageCard);
-  //   }
-
-  //   return imageSlides;
-  // }
+  void navigateToProfilePage() {
+    Navigator.of(context).push(MaterialPageRoute(builder: (context) => ProfilePage(user_email: widget.user_email)));
+  }
 
   Widget CustomGestureDetector(Map<String, dynamic> newsData) {
     // FUTURE -> should accept title and content as well
@@ -111,7 +107,32 @@ class _HomePageState extends State<HomePage> {
         ),
         onPressed: triggerDevice,
         child: Text(
-          "Diagnoze Now",
+          "Diagnose Now",
+          textAlign: TextAlign.center,
+        ),
+      ),
+    );
+  }
+
+  Widget Profile() {
+    return Container(
+      width: 300,
+      child: ElevatedButton(
+        style: ButtonStyle(
+          shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+            RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(
+                  10.0), // Adjust the value to control the roundness
+            ),
+          ),
+          padding: MaterialStateProperty.all<EdgeInsetsGeometry>(
+              EdgeInsets.all(16.0)),
+          backgroundColor: MaterialStateProperty.all<Color>(Colors.purple),
+          foregroundColor: MaterialStateProperty.all<Color>(Colors.white),
+        ),
+        onPressed: navigateToProfilePage,
+        child: Text(
+          "Profile",
           textAlign: TextAlign.center,
         ),
       ),
@@ -195,11 +216,13 @@ class _HomePageState extends State<HomePage> {
                 fontSize: 80,
               ),
             ),
-            SizedBox(height: 70),
+            SizedBox(height: 50),
             DianoseNow(),
             SizedBox(height: 20),
+            Profile(),
+            SizedBox(height: 20),
             CheckReport(),
-            SizedBox(height: 70),
+            SizedBox(height: 40),
             NewsSection(),
           ],
         ),

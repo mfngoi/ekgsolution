@@ -24,7 +24,7 @@ class _LoginInPageState extends State<LoginInPage> {
 
   void navigateToHomePage() {
     Navigator.of(context)
-        .push(MaterialPageRoute(builder: (context) => const HomePage()));
+        .push(MaterialPageRoute(builder: (context) => HomePage(user_email: _emailController.text)));
   }
 
   Widget CustomTextField(String hintValue) {

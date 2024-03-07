@@ -21,7 +21,7 @@ class _SignUpPageState extends State<SignUpPage> {
 
   void navigateToHomePage() {
     Navigator.of(context)
-        .push(MaterialPageRoute(builder: (context) => const HomePage()));
+        .push(MaterialPageRoute(builder: (context) => HomePage(user_email: _emailController.text)));
   }
 
   void navigateToLoginPage() {

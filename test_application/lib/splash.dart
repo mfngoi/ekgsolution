@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:test_application/signuppage.dart';
+import 'package:test_application/loginpage.dart';
 
 class Splash extends StatefulWidget {
   const Splash({super.key});
@@ -19,7 +19,7 @@ class _SplashState extends State<Splash> {
 
   void navigateToHomePage() {
     Navigator.pushReplacement(
-        context, MaterialPageRoute(builder: (context) => SignUpPage()));
+        context, MaterialPageRoute(builder: (context) => LoginInPage()));
   }
 
   @override
