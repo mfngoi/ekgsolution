@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 import neurokit2 as nk
 from neurokit2.epochs import epochs_to_df
+from csv_process import avg_pr_interval_reading, avg_qt_interval_reading
 import pandas as pd
 import numpy as np
 
@@ -15,9 +16,10 @@ with open("target/heartsample_5v_01.log", 'r') as file:
             break
 
 # Standardize data
+print(f"{input_data=}")
 input_data_np = np.asarray(input_data)
 # input_data_np = input_data_np / 4095      # Convert voltages to 0-1 units
-print(input_data_np)
+# print(input_data_np)
 
 # Process ecg
 ecg_signals, info = nk.ecg_process(input_data_np, sampling_rate=1000)
@@ -26,6 +28,11 @@ print(ecg_signals)
 # ecg_signals['ECG_P_Offsets'].to_csv('hello.csv')
 # print(ecg_signals['ECG_P_Offsets'])
 print(info)
+
+avg_pr = avg_pr_interval_reading(ecg_signals, info)
+avg_qt = avg_qt_interval_reading(ecg_signals, info)
+print(f"{avg_pr=}")
+print(f"{avg_qt=}")
 
 # Examine plot (Displays ecg analysis overview)s
 nk.ecg_plot(ecg_signals, info)
@@ -47,7 +54,8 @@ print(col)
 
 # Calculate average heartbeat
 mean_heartbeat = df.groupby("Time")[[col]].mean()
-print(mean_heartbeat)
+print(f"{mean_heartbeat=}")
+mean_heartbeat.to_csv("target/mean_heartbeat.csv")
 mean_heartbeat.plot()
 
 # np_mean_heartbeat = mean_heartbeat["ECG_Clean"].to_numpy()
