@@ -159,7 +159,7 @@ class _SignUpPageState extends State<SignUpPage> {
 
     // Create user information in database
     final report = <String, dynamic>{
-      "ekg": [200, 300, 400, 500, 600, 700, 800, 500, 400, 300, 400]
+      "signals": [200, 300, 400, 500, 600, 700, 800, 500, 400, 300, 400]
     };
     final user = <String, dynamic>{
       "email": _emailController.text,

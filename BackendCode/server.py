@@ -44,21 +44,14 @@ def newsInfo():
 
 @app.route("/ekgclassify", methods=['POST'])
 def ekgClassify():
-    value = request.form
-    # print(f"{value}")
 
     # Handling profile
     profile = request.form['profile'] # Extract contents of profile key
-    # print(f"{profile=}")
     profile = json.loads(profile)   # Convert string to python dictionary
-    # print(f"{profile['sex']}")
-    # print(f"{profile['age']}")
-    # print(f"{profile['ethnicity']}")
 
     # Handling signals
     ecg_signals = request.form['signals']
     ecg_signals = ecg_signals.split(', ')
-    # print(f"{ecg_signals=}")
 
     # Get condition in result
     result = ecgClassify(profile, ecg_signals, ecgClassifier, encoders)

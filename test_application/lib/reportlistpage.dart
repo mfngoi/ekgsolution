@@ -1,14 +1,51 @@
 import 'package:flutter/material.dart';
 import 'package:test_application/reportpage.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class ReportListPage extends StatefulWidget {
-  const ReportListPage({super.key});
+  final String user_email;
+  const ReportListPage({super.key, required this.user_email});
 
   @override
   State<ReportListPage> createState() => _ReportListPageState();
 }
 
 class _ReportListPageState extends State<ReportListPage> {
+  late Future<List> reports;  // List of reports user has collected
+
+  @override
+  void initState() {
+    super.initState();
+    reports = QueryReports();
+  }
+
+  Future<List> QueryReports() async {
+    List reports = [];
+    final db = await FirebaseFirestore.instance;  // Connect to db
+
+    // Query all documents in reports collection in specific user
+    await db
+        .collection("users")
+        .doc(widget.user_email)
+        .collection("reports")
+        .get()
+        .then(
+      (querySnapshot) {
+        for (var docSnapshot in querySnapshot.docs) {
+          reports.add(docSnapshot.id);
+          // print(docSnapshot.id);
+          // print(docSnapshot.data());
+        }
+      },
+      onError: (e) => print("Error completing: $e"),
+    );
+
+    // Sort report from most recent to least recent
+    reports.sort((a, b) => DateTime.parse(b).compareTo(DateTime.parse(a)));
+
+    return reports;
+  }
+
   Widget TopWindow() {
     return Container(
       child: Padding(
@@ -40,7 +77,7 @@ class _ReportListPageState extends State<ReportListPage> {
         .push(MaterialPageRoute(builder: (context) => ReportPage()));
   }
 
-  Widget ReportRow() {
+  Widget ReportRow(String report_id) {
     return GestureDetector(
       onTap: () {
         navigateToReportPage();
@@ -52,7 +89,7 @@ class _ReportListPageState extends State<ReportListPage> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: <Widget>[
               Icon(Icons.settings),
-              Text("Your Report"),
+              Text(report_id),
               Icon(
                 Icons.arrow_forward_ios,
                 size: 15,
@@ -62,7 +99,7 @@ class _ReportListPageState extends State<ReportListPage> {
     );
   }
 
-  Widget ReportList() {
+  Widget ReportList(List<Widget> reportRows) {
     return Container(
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 30.0),
@@ -80,19 +117,34 @@ class _ReportListPageState extends State<ReportListPage> {
               child: Container(
                 height: 200,
                 child: ListView(
-                  children: <Widget>[
-                    ReportRow(),
-                    ReportRow(),
-                    ReportRow(),
-                    ReportRow(),
-                    ReportRow(),
-                  ],
+                  children: reportRows,
                 ),
               ),
             ),
           ],
         ),
       ),
+    );
+  }
+
+  Widget ReportListSection() {
+    return FutureBuilder(
+      future: reports,
+      builder: (context, snapshot) {
+        if (snapshot.hasData) {
+          List reports = snapshot.data as List;
+          // print(reports);
+
+          List<Widget> reportChildren = [];
+          for (int i = 0; i < reports.length; i++) {
+            reportChildren.add(ReportRow(reports[i]));
+          }
+
+          return ReportList(reportChildren);
+        } else {
+          return Text("Unable to get reports from database...");
+        }
+      },
     );
   }
 
@@ -114,6 +166,13 @@ class _ReportListPageState extends State<ReportListPage> {
           style: TextStyle(
               color: Colors.black, fontWeight: FontWeight.bold, fontSize: 25.0),
         ),
+        actions: <Widget>[
+          ElevatedButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: Text("Back")),
+        ],
       ),
       body: Center(
         child: Column(
@@ -121,11 +180,9 @@ class _ReportListPageState extends State<ReportListPage> {
           children: <Widget>[
             SizedBox(height: 20),
             TopWindow(),
-            Container(
-              height: 20,
-              color: Colors.purple,
-            ),
-            ReportList(),
+            SizedBox(height: 20),
+            ReportListSection(),
+            SizedBox(height: 20),
           ],
         ),
       ),

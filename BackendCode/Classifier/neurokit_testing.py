@@ -47,14 +47,14 @@ print(col)
 
 # Calculate average heartbeat
 mean_heartbeat = df.groupby("Time")[[col]].mean()
-# print(mean_heartbeat)
+print(mean_heartbeat)
 mean_heartbeat.plot()
 
-np_mean_heartbeat = mean_heartbeat["ECG_Clean"].to_numpy()
-np_mean_heartbeat = np.hstack((np_mean_heartbeat, np.zeros(1000)))
-waves, signals = nk.ecg_delineate(np_mean_heartbeat)
-print(waves)
-print(signals)
+# np_mean_heartbeat = mean_heartbeat["ECG_Clean"].to_numpy()
+# np_mean_heartbeat = np.hstack((np_mean_heartbeat, np.zeros(1000)))
+# waves, signals = nk.ecg_delineate(np_mean_heartbeat)
+# print(waves)
+# print(signals)
 
 
 # print(np_mean_heartbeat.shape)
@@ -63,4 +63,4 @@ print(signals)
 # print(info)
 # instant_peaks.to_csv('target/instant_peaks.csv')
 
-# plt.show()
+plt.show()
