@@ -45,6 +45,14 @@ def newsInfo():
 @app.route("/ekgclassify", methods=['POST'])
 def ekgClassify():
 
+    # data = json.loads(request.form)
+
+    # print(request.form)
+    # print(request.form.keys())
+    # print(request.data)
+    # print(request.values)
+    # print(request.json)
+
     # Handling profile
     profile = request.form['profile'] # Extract contents of profile key
     profile = json.loads(profile)   # Convert string to python dictionary
@@ -60,5 +68,4 @@ def ekgClassify():
     return result
 
 if __name__ == '__main__': # Runs app when the program is started
-    app.run(host='0.0.0.0', debug=True)
-
+    app.run(host='0.0.0.0', debug=True, port=5000)

@@ -30,11 +30,6 @@ class _ReportPageState extends State<ReportPage> {
         Navigator.pop(context);
       },
       child: Text("Back"),
-      // style: RButtonStyle(
-      //   shape: MaterialStateProperty.all(CircleBorder()),
-      //   backgroundColor: MaterialStateProperty.all<Color>(Colors.transparent),
-      //   foregroundColor: MaterialStateProperty.all<Color>(Colors.white),
-      // ),
     );
   }
 

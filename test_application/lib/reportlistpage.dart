@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:test_application/reportpage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:fl_chart/fl_chart.dart';
 
 class ReportListPage extends StatefulWidget {
   final String user_email;
@@ -11,17 +12,19 @@ class ReportListPage extends StatefulWidget {
 }
 
 class _ReportListPageState extends State<ReportListPage> {
-  late Future<List> reports;  // List of reports user has collected
+  late Future<List> reports; // List of reports user has collected
+  late Future<List> avg_heartbeat;
 
   @override
   void initState() {
     super.initState();
     reports = QueryReports();
+    avg_heartbeat = QueryAvgHeartBeat();
   }
 
   Future<List> QueryReports() async {
     List reports = [];
-    final db = await FirebaseFirestore.instance;  // Connect to db
+    final db = await FirebaseFirestore.instance; // Connect to db
 
     // Query all documents in reports collection in specific user
     await db
@@ -46,7 +49,63 @@ class _ReportListPageState extends State<ReportListPage> {
     return reports;
   }
 
-  Widget TopWindow() {
+  Future<List> QueryAvgHeartBeat() async {
+    List reports = [];
+    final db = await FirebaseFirestore.instance; // Connect to db
+
+    // Query all documents in reports collection in specific user
+    await db
+        .collection("users")
+        .doc(widget.user_email)
+        .collection("reports")
+        .get()
+        .then(
+      (querySnapshot) {
+        for (var docSnapshot in querySnapshot.docs) {
+          reports.add(docSnapshot.id);
+        }
+      },
+      onError: (e) => print("Error completing: $e"),
+    );
+
+    // Sort report from most recent to least recent
+    reports.sort((a, b) => DateTime.parse(b).compareTo(DateTime.parse(a)));
+
+    // Query avg heartbeat signal from recent report id
+    String recent_report = reports[0];
+    List recent_avg_heartbeat = [];
+    await db
+        .collection("users")
+        .doc(widget.user_email)
+        .collection("reports")
+        .doc(recent_report)
+        .get()
+        .then(
+      (DocumentSnapshot doc) {
+        final data = doc.data()
+            as Map<String, dynamic>; // Gives you the document as a Map
+        // print(data);
+        // print(data["avg_heartbeat"]);
+        for (int i=0; i< data["avg_heartbeat"].length; i++) {
+          recent_avg_heartbeat.add(data["avg_heartbeat"][i]);
+        }
+      },
+      onError: (e) => print("Error getting document: $e"),
+    );
+    // print(recent_avg_heartbeat);
+    return recent_avg_heartbeat;
+  }
+
+  List<FlSpot> generatePoints(List values) {
+    List<FlSpot> points = [];
+
+    for (int i = 0; i < values.length; i++) {
+      points.add(new FlSpot(i.toDouble(), values[i].toDouble()));
+    }
+    return points;
+  }
+
+  Widget TopWindow(List recent_avg_hearbeat) {
     return Container(
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 30.0),
@@ -63,12 +122,38 @@ class _ReportListPageState extends State<ReportListPage> {
               borderRadius: BorderRadius.circular(7.0),
               child: Container(
                 height: 200,
-                color: Colors.purple,
+                color: const Color.fromARGB(255, 223, 173, 231),
+                child: LineChart(
+                  LineChartData(
+                    lineBarsData: [
+                      LineChartBarData(
+                        spots: generatePoints(recent_avg_hearbeat),
+                      ),
+                    ],
+                    // read about it in the LineChartData section
+                  ),
+                ),
               ),
             ),
           ],
         ),
       ),
+    );
+  }
+
+  Widget TopWindowSection() {
+    return FutureBuilder(
+      future: avg_heartbeat,
+      builder: (context, snapshot) {
+        if (snapshot.hasData) {
+          List avg_heartbeat = snapshot.data as List;
+          // print(avg_heartbeat);
+
+          return TopWindow(avg_heartbeat);
+        } else {
+          return Text("Unable to get recent report from database...");
+        }
+      },
     );
   }
 
@@ -179,7 +264,7 @@ class _ReportListPageState extends State<ReportListPage> {
           mainAxisAlignment: MainAxisAlignment.start,
           children: <Widget>[
             SizedBox(height: 20),
-            TopWindow(),
+            TopWindowSection(),
             SizedBox(height: 20),
             ReportListSection(),
             SizedBox(height: 20),
