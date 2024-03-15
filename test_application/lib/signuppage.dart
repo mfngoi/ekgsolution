@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:test_application/homepage.dart';
 import 'package:test_application/loginpage.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:test_application/masterpage.dart';
 
 class SignUpPage extends StatefulWidget {
   const SignUpPage({super.key});
@@ -19,9 +19,9 @@ class _SignUpPageState extends State<SignUpPage> {
   bool obscureValue1 = true;
   bool obscureValue2 = true;
 
-  void navigateToHomePage() {
+  void navigateToMasterPage() {
     Navigator.of(context)
-        .push(MaterialPageRoute(builder: (context) => HomePage(user_email: _emailController.text)));
+        .push(MaterialPageRoute(builder: (context) => MasterPage()));
   }
 
   void navigateToLoginPage() {
@@ -151,7 +151,7 @@ class _SignUpPageState extends State<SignUpPage> {
     // Create a user account for firebase authentication
     String email_text = _emailController.text;
     String password_text = _passwordController2.text;
-    await FirebaseAuth.instance.createUserWithEmailAndPassword(
+    UserCredential credential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
       email: email_text,
       password: password_text,
     );
@@ -173,18 +173,18 @@ class _SignUpPageState extends State<SignUpPage> {
     final db = await FirebaseFirestore.instance; // Connect to database
 
     await db
-        .collection("users")
-        .doc(_emailController.text)
+        .collection("users_test")
+        .doc(credential.user?.uid)
         .set(user); // Add user info to database
     await db
-        .collection("users")
-        .doc(_emailController.text)
+        .collection("users_test")
+        .doc(credential.user?.uid)
         .collection("reports")
-        .doc()
+        .doc(DateTime.now().toString())
         .set(report); // Add dummy ekg report into database
     print("Created User Data");
 
-    navigateToHomePage();
+    navigateToMasterPage();
   }
 
   Widget SignUpButton() {

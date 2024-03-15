@@ -1,16 +1,24 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:test_application/main.dart';
+import 'package:test_application/splash.dart';
 
 class ProfilePage extends StatefulWidget {
-  final String user_email;
-  const ProfilePage({super.key, required this.user_email});
+  const ProfilePage({super.key});
 
   @override
   State<ProfilePage> createState() => _ProfilePageState();
 }
 
 class _ProfilePageState extends State<ProfilePage> {
-  // sex, age, height, weight, ethnicity
+  late User user;
+
+  @override
+  void initState() {
+    super.initState();
+    user = auth.currentUser!;
+  }
 
   final _sexController = TextEditingController();
   final _ageController = TextEditingController();
@@ -18,27 +26,12 @@ class _ProfilePageState extends State<ProfilePage> {
   final _weightController = TextEditingController();
   final _ethnicityController = TextEditingController();
 
-  void SubmitData() async {
-
-    final newData = <String, dynamic>{
-      "sex": _sexController.text,
-      "age": _ageController.text,
-      "height": _heightController.text,
-      "weight": _weightController.text,
-      "race": _ethnicityController.text,
-    };
-
-    final db = await FirebaseFirestore.instance; // Connect to database
-
-    final docRef = await db.collection("users").doc(widget.user_email); // Get container of user data
-    await docRef.update(newData); // Update user data
-
-  }
-
   Widget BackButton() {
-    return ElevatedButton(onPressed: () {
-        Navigator.pop(context);
-      }, child: Text('Back'));
+    return ElevatedButton(
+        onPressed: () {
+          Navigator.pop(context);
+        },
+        child: Text('Back'));
   }
 
   Widget SexTextField(String hintValue) {
@@ -200,22 +193,49 @@ class _ProfilePageState extends State<ProfilePage> {
     return ElevatedButton(onPressed: SubmitData, child: Text('Submit'));
   }
 
+  void SubmitData() async {
+    final newData = <String, dynamic>{
+      "sex": _sexController.text,
+      "age": _ageController.text,
+      "height": _heightController.text,
+      "weight": _weightController.text,
+      "race": _ethnicityController.text,
+    };
+
+    final db = await FirebaseFirestore.instance; // Connect to database
+
+    final docRef = await db
+        .collection("users_test")
+        .doc(user.uid); // Get container of user data
+    await docRef.update(newData); // Update user data
+  }
+
+  Widget LogOutButton() {
+    return ElevatedButton(onPressed: signOut, child: Text("Sign Out"));
+  }
+
+  void signOut() async {
+    await auth.signOut();
+    Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(builder: (context) => Splash()), (route) => false);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Center(
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            BackButton(),
-            SexTextField('Sex (M/F) ... '),
-            AgeTextField('Age ... '),
-            HeightTextField('Height (cm) ...'),
-            WeightTextField('Weight (kg) ...'),
-            EthnicityTextField('Ethnicity ...'),
-            SubmitButton(),
-          ]
-        ),
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              BackButton(),
+              SexTextField('Sex (M/F) ... '),
+              AgeTextField('Age ... '),
+              HeightTextField('Height (cm) ...'),
+              WeightTextField('Weight (kg) ...'),
+              EthnicityTextField('Ethnicity ...'),
+              SubmitButton(),
+              LogOutButton(),
+            ]),
       ),
     );
   }

@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:test_application/main.dart';
 import 'package:test_application/reportpage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fl_chart/fl_chart.dart';
 
 class ReportListPage extends StatefulWidget {
-  final String user_email;
-  const ReportListPage({super.key, required this.user_email});
+  const ReportListPage({super.key});
 
   @override
   State<ReportListPage> createState() => _ReportListPageState();
@@ -14,10 +15,12 @@ class ReportListPage extends StatefulWidget {
 class _ReportListPageState extends State<ReportListPage> {
   late Future<List> reports; // List of reports user has collected
   late Future<List> avg_heartbeat;
+  late User user;
 
   @override
   void initState() {
     super.initState();
+    user = auth.currentUser!;
     reports = QueryReports();
     avg_heartbeat = QueryAvgHeartBeat();
   }
@@ -28,8 +31,8 @@ class _ReportListPageState extends State<ReportListPage> {
 
     // Query all documents in reports collection in specific user
     await db
-        .collection("users")
-        .doc(widget.user_email)
+        .collection("users_test")
+        .doc(user.uid)
         .collection("reports")
         .get()
         .then(
@@ -55,8 +58,8 @@ class _ReportListPageState extends State<ReportListPage> {
 
     // Query all documents in reports collection in specific user
     await db
-        .collection("users")
-        .doc(widget.user_email)
+        .collection("users_test")
+        .doc(user.uid)
         .collection("reports")
         .get()
         .then(
@@ -75,8 +78,8 @@ class _ReportListPageState extends State<ReportListPage> {
     String recent_report = reports[0];
     List recent_avg_heartbeat = [];
     await db
-        .collection("users")
-        .doc(widget.user_email)
+        .collection("users_test")
+        .doc(user.uid)
         .collection("reports")
         .doc(recent_report)
         .get()
@@ -270,22 +273,6 @@ class _ReportListPageState extends State<ReportListPage> {
             SizedBox(height: 20),
           ],
         ),
-      ),
-      bottomNavigationBar: BottomNavigationBar(
-        items: const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: "",
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.addchart),
-            label: "",
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: "",
-          ),
-        ],
       ),
     );
   }

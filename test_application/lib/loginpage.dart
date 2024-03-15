@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:test_application/masterpage.dart';
 import 'package:test_application/signuppage.dart';
-import 'package:test_application/homepage.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 class LoginInPage extends StatefulWidget {
@@ -24,7 +24,7 @@ class _LoginInPageState extends State<LoginInPage> {
 
   void navigateToHomePage() {
     Navigator.of(context)
-        .push(MaterialPageRoute(builder: (context) => HomePage(user_email: _emailController.text)));
+        .push(MaterialPageRoute(builder: (context) => MasterPage()));
   }
 
   Widget CustomTextField(String hintValue) {

@@ -1,15 +1,16 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:test_application/main.dart';
 import 'package:test_application/reportlistpage.dart';
 import 'package:test_application/newspage.dart';
 import 'package:test_application/profilepage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:http/http.dart' as http;
 
 class HomePage extends StatefulWidget {
-  final String user_email;
-  const HomePage({super.key, required this.user_email});
+  const HomePage({super.key});
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -17,10 +18,12 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   late Future<Map> newsInfo;
+  late User user;
 
   @override
   void initState() {
     super.initState();
+    user = auth.currentUser!;
     newsInfo = getNewsInfo();
   }
 
@@ -35,7 +38,7 @@ class _HomePageState extends State<HomePage> {
 
       final Map<String, dynamic> newsInfo = jsonDecode(server_response.body);
 
-      print(newsInfo);
+      // print(newsInfo);
 
       return newsInfo;
     } catch (e) {
@@ -10725,8 +10728,8 @@ class _HomePageState extends State<HomePage> {
     final db = await FirebaseFirestore.instance; // Connect to database
 
     await db
-        .collection("users")
-        .doc(widget.user_email)
+        .collection("users_test")
+        .doc(user.uid)
         .collection("reports") 
         .doc(DateTime.now().toString())
         .set(report1);
@@ -10736,17 +10739,12 @@ class _HomePageState extends State<HomePage> {
 
   void navigateToReportPage() {
     Navigator.of(context).push(MaterialPageRoute(
-        builder: (context) => ReportListPage(user_email: widget.user_email)));
+        builder: (context) => ReportListPage()));
   }
 
   void navigateToNewsPage(Map<String, dynamic> newsData) {
     Navigator.of(context).push(
         MaterialPageRoute(builder: (context) => NewsPage(newsData: newsData)));
-  }
-
-  void navigateToProfilePage() {
-    Navigator.of(context).push(MaterialPageRoute(
-        builder: (context) => ProfilePage(user_email: widget.user_email)));
   }
 
   Widget CustomGestureDetector(Map<String, dynamic> newsData) {
@@ -10793,31 +10791,6 @@ class _HomePageState extends State<HomePage> {
         onPressed: SubmitSampleReports,
         child: Text(
           "Diagnose Now",
-          textAlign: TextAlign.center,
-        ),
-      ),
-    );
-  }
-
-  Widget Profile() {
-    return Container(
-      width: 300,
-      child: ElevatedButton(
-        style: ButtonStyle(
-          shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-            RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(
-                  10.0), // Adjust the value to control the roundness
-            ),
-          ),
-          padding: MaterialStateProperty.all<EdgeInsetsGeometry>(
-              EdgeInsets.all(16.0)),
-          backgroundColor: MaterialStateProperty.all<Color>(Colors.purple),
-          foregroundColor: MaterialStateProperty.all<Color>(Colors.white),
-        ),
-        onPressed: navigateToProfilePage,
-        child: Text(
-          "Profile",
           textAlign: TextAlign.center,
         ),
       ),
@@ -10904,29 +10877,11 @@ class _HomePageState extends State<HomePage> {
             SizedBox(height: 50),
             DianoseNow(),
             SizedBox(height: 20),
-            Profile(),
-            SizedBox(height: 20),
             CheckReport(),
             SizedBox(height: 40),
             NewsSection(),
           ],
         ),
-      ),
-      bottomNavigationBar: BottomNavigationBar(
-        items: const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: "",
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.addchart),
-            label: "",
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: "",
-          ),
-        ],
       ),
     );
   }
