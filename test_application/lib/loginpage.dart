@@ -17,6 +17,13 @@ class _LoginInPageState extends State<LoginInPage> {
   bool obscureValue = true;
   bool rememberValue = true;
 
+    @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
+
   void navigateToSignUpPage() {
     Navigator.of(context)
         .push(MaterialPageRoute(builder: (context) => const SignUpPage()));

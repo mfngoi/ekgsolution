@@ -2,9 +2,8 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:test_application/main.dart';
-import 'package:test_application/reportlistpage.dart';
+import 'package:test_application/reportweeklistpage.dart';
 import 'package:test_application/newspage.dart';
-import 'package:test_application/profilepage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:http/http.dart' as http;
@@ -23,6 +22,8 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
+    print("Entered Homepage");
+
     user = auth.currentUser!;
     newsInfo = getNewsInfo();
   }
@@ -55,7 +56,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   void SubmitSampleReports() async {
-    print("triggered submitsamplereports()...");
+    print(user.email! + " triggered submitsamplereports()...");
 
     final report1 = <String, dynamic>{
       "signals": [
@@ -10725,21 +10726,63 @@ class _HomePageState extends State<HomePage> {
     // print(result.statusCode);
     // print(result.body);
 
+    // Code to determine what week the report should be stored in
+    DateTime date = DateTime.now();
+    // date = DateTime(2024,3,18,date.hour, date.minute, date.second);
+
+    int weekOfYear = date.weekday == DateTime.sunday
+        ? date.difference(DateTime(date.year, 1, 1)).inDays ~/ 7
+        : date.difference(DateTime(date.year, 1, 1)).inDays ~/ 7 + 1;
+
+    String weekDocId = weekOfYear.toString() + "_" + date.year.toString();
+
     final db = await FirebaseFirestore.instance; // Connect to database
+
+    final weekExists = await db
+        .collection("users_test")
+        .doc(user.uid)
+        .collection("weekly_reports")
+        .get()
+        .then(
+      (querySnapshot) {
+        for (var docSnapshot in querySnapshot.docs) {
+          if(docSnapshot.id == weekDocId) {
+            return true;
+          }
+        }
+        return false;
+      },
+      onError: (e) => print("Error completing: $e"),
+    );
+
+    final weekReport = <String, dynamic>{
+      "warnings": 0,
+    };
+
+    if(!weekExists) {
+      await db
+        .collection("users_test")
+        .doc(user.uid)
+        .collection("weekly_reports") // create colletion for weeks
+        .doc(weekDocId)
+        .set(weekReport); // Add warnings field
+    }
 
     await db
         .collection("users_test")
         .doc(user.uid)
-        .collection("reports") 
-        .doc(DateTime.now().toString())
+        .collection("weekly_reports")
+        .doc(weekDocId)
+        .collection("reports")
+        .doc(date.toString())
         .set(report1);
 
     print("Submitted sample data as report...");
   }
 
   void navigateToReportPage() {
-    Navigator.of(context).push(MaterialPageRoute(
-        builder: (context) => ReportListPage()));
+    Navigator.of(context)
+        .push(MaterialPageRoute(builder: (context) => ReportWeekListPage()));
   }
 
   void navigateToNewsPage(Map<String, dynamic> newsData) {

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:test_application/aichatpage.dart';
 import 'package:test_application/settingspage.dart';
 import 'package:test_application/homepage.dart';
-import 'package:test_application/reportlistpage.dart';
+import 'package:test_application/reportweeklistpage.dart';
 
 class MasterPage extends StatefulWidget {
   const MasterPage({super.key});
@@ -22,7 +22,7 @@ class _MasterPageState extends State<MasterPage> {
 
   static final List<Widget> widgetMenus = <Widget> [
     const HomePage(),
-    const ReportListPage(),
+    const ReportWeekListPage(),
     const AIChatPage(),
     const SettingsPage(),
   ];

@@ -1,45 +1,46 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:test_application/main.dart';
 import 'package:test_application/reportpage.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:fl_chart/fl_chart.dart';
 
 class ReportListPage extends StatefulWidget {
-  const ReportListPage({super.key});
-
+  final String week_id;
+  const ReportListPage({super.key, required this.week_id});
   @override
   State<ReportListPage> createState() => _ReportListPageState();
 }
 
 class _ReportListPageState extends State<ReportListPage> {
-  late Future<List> reports; // List of reports user has collected
-  late Future<List> avg_heartbeat;
+  late Future<List<QueryDocumentSnapshot>> reports;
   late User user;
 
   @override
   void initState() {
     super.initState();
+    print("Entered ReportListPage: " + widget.week_id);
+
     user = auth.currentUser!;
     reports = QueryReports();
-    avg_heartbeat = QueryAvgHeartBeat();
   }
 
-  Future<List> QueryReports() async {
-    List reports = [];
+  Future<List<QueryDocumentSnapshot>> QueryReports() async {
+    List<QueryDocumentSnapshot> reports = [];
     final db = await FirebaseFirestore.instance; // Connect to db
 
     // Query all documents in reports collection in specific user
     await db
         .collection("users_test")
         .doc(user.uid)
+        .collection("weekly_reports")
+        .doc(widget.week_id)
         .collection("reports")
         .get()
         .then(
       (querySnapshot) {
         for (var docSnapshot in querySnapshot.docs) {
-          reports.add(docSnapshot.id);
-          // print(docSnapshot.id);
+          reports.add(docSnapshot);
+          print(docSnapshot.id);
           // print(docSnapshot.data());
         }
       },
@@ -47,128 +48,53 @@ class _ReportListPageState extends State<ReportListPage> {
     );
 
     // Sort report from most recent to least recent
-    reports.sort((a, b) => DateTime.parse(b).compareTo(DateTime.parse(a)));
+    reports
+        .sort((a, b) => DateTime.parse(b.id).compareTo(DateTime.parse(a.id)));
 
     return reports;
   }
 
-  Future<List> QueryAvgHeartBeat() async {
-    List reports = [];
-    final db = await FirebaseFirestore.instance; // Connect to db
+  void navigateToReportPage(String report_id) {
+    Navigator.of(context).push(MaterialPageRoute(
+        builder: (context) =>
+            ReportPage(week_id: widget.week_id, report_id: report_id)));
+  }
 
-    // Query all documents in reports collection in specific user
-    await db
-        .collection("users_test")
-        .doc(user.uid)
-        .collection("reports")
-        .get()
-        .then(
-      (querySnapshot) {
-        for (var docSnapshot in querySnapshot.docs) {
-          reports.add(docSnapshot.id);
-        }
+  Widget BackButton() {
+    return ElevatedButton(
+      onPressed: () {
+        Navigator.pop(context);
       },
-      onError: (e) => print("Error completing: $e"),
-    );
-
-    // Sort report from most recent to least recent
-    reports.sort((a, b) => DateTime.parse(b).compareTo(DateTime.parse(a)));
-
-    // Query avg heartbeat signal from recent report id
-    String recent_report = reports[0];
-    List recent_avg_heartbeat = [];
-    await db
-        .collection("users_test")
-        .doc(user.uid)
-        .collection("reports")
-        .doc(recent_report)
-        .get()
-        .then(
-      (DocumentSnapshot doc) {
-        final data = doc.data()
-            as Map<String, dynamic>; // Gives you the document as a Map
-        // print(data);
-        // print(data["avg_heartbeat"]);
-        for (int i=0; i< data["avg_heartbeat"].length; i++) {
-          recent_avg_heartbeat.add(data["avg_heartbeat"][i]);
-        }
-      },
-      onError: (e) => print("Error getting document: $e"),
-    );
-    // print(recent_avg_heartbeat);
-    return recent_avg_heartbeat;
-  }
-
-  List<FlSpot> generatePoints(List values) {
-    List<FlSpot> points = [];
-
-    for (int i = 0; i < values.length; i++) {
-      points.add(new FlSpot(i.toDouble(), values[i].toDouble()));
-    }
-    return points;
-  }
-
-  Widget TopWindow(List recent_avg_hearbeat) {
-    return Container(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 30.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                Text("Most Recent Report"),
-              ],
-            ),
-            ClipRRect(
-              borderRadius: BorderRadius.circular(7.0),
-              child: Container(
-                height: 200,
-                color: const Color.fromARGB(255, 223, 173, 231),
-                child: LineChart(
-                  LineChartData(
-                    lineBarsData: [
-                      LineChartBarData(
-                        spots: generatePoints(recent_avg_hearbeat),
-                      ),
-                    ],
-                    // read about it in the LineChartData section
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
+      child: Text("Back"),
     );
   }
 
-  Widget TopWindowSection() {
+  Widget ReportListSection() {
     return FutureBuilder(
-      future: avg_heartbeat,
+      future: reports,
       builder: (context, snapshot) {
         if (snapshot.hasData) {
-          List avg_heartbeat = snapshot.data as List;
-          // print(avg_heartbeat);
+          List<QueryDocumentSnapshot> reports =
+              snapshot.data as List<QueryDocumentSnapshot>;
+          // print(reports);
 
-          return TopWindow(avg_heartbeat);
+          List<Widget> reportChildren = [];
+          for (int i = 0; i < reports.length; i++) {
+            reportChildren.add(ReportRow(reports[i].id));
+          }
+
+          return ReportList(reportChildren);
         } else {
-          return Text("Unable to get recent report from database...");
+          return Text("Unable to get reports from database...");
         }
       },
     );
-  }
-
-  void navigateToReportPage() {
-    Navigator.of(context)
-        .push(MaterialPageRoute(builder: (context) => ReportPage()));
   }
 
   Widget ReportRow(String report_id) {
     return GestureDetector(
       onTap: () {
-        navigateToReportPage();
+        navigateToReportPage(report_id);
       },
       child: Container(
           margin: const EdgeInsets.only(bottom: 5.0),
@@ -204,6 +130,7 @@ class _ReportListPageState extends State<ReportListPage> {
               borderRadius: BorderRadius.circular(7.0),
               child: Container(
                 height: 200,
+                color: Colors.purple,
                 child: ListView(
                   children: reportRows,
                 ),
@@ -215,62 +142,16 @@ class _ReportListPageState extends State<ReportListPage> {
     );
   }
 
-  Widget ReportListSection() {
-    return FutureBuilder(
-      future: reports,
-      builder: (context, snapshot) {
-        if (snapshot.hasData) {
-          List reports = snapshot.data as List;
-          // print(reports);
-
-          List<Widget> reportChildren = [];
-          for (int i = 0; i < reports.length; i++) {
-            reportChildren.add(ReportRow(reports[i]));
-          }
-
-          return ReportList(reportChildren);
-        } else {
-          return Text("Unable to get reports from database...");
-        }
-      },
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      resizeToAvoidBottomInset: false,
-      appBar: AppBar(
-        centerTitle: false,
-        leading: Padding(
-          padding: const EdgeInsets.only(left: 40.0),
-          child: Icon(
-            Icons.file_copy,
-            color: Colors.purple,
-          ),
-        ),
-        title: Text(
-          "Personal Reports",
-          style: TextStyle(
-              color: Colors.black, fontWeight: FontWeight.bold, fontSize: 25.0),
-        ),
-        actions: <Widget>[
-          ElevatedButton(
-              onPressed: () {
-                Navigator.pop(context);
-              },
-              child: Text("Back")),
-        ],
-      ),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           children: <Widget>[
-            SizedBox(height: 20),
-            TopWindowSection(),
-            SizedBox(height: 20),
-            ReportListSection(),
-            SizedBox(height: 20),
+            SizedBox(height: 70),
+            BackButton(),
+            ReportListSection()
           ],
         ),
       ),

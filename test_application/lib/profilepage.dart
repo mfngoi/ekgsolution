@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:test_application/loginpage.dart';
 import 'package:test_application/main.dart';
 import 'package:test_application/splash.dart';
 
@@ -17,7 +18,19 @@ class _ProfilePageState extends State<ProfilePage> {
   @override
   void initState() {
     super.initState();
+    print("Entered ProfilePage");
+
     user = auth.currentUser!;
+  }
+
+  @override
+  void dispose() {
+    _sexController.dispose();
+    _ageController.dispose();
+    _heightController.dispose();
+    _weightController.dispose();
+    _ethnicityController.dispose();
+    super.dispose();
   }
 
   final _sexController = TextEditingController();
@@ -217,7 +230,8 @@ class _ProfilePageState extends State<ProfilePage> {
   void signOut() async {
     await auth.signOut();
     Navigator.of(context).pushAndRemoveUntil(
-        MaterialPageRoute(builder: (context) => Splash()), (route) => false);
+        MaterialPageRoute(builder: (context) => LoginInPage()),
+        (route) => false);
   }
 
   @override

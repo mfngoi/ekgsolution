@@ -1,12 +1,9 @@
 import 'dart:async';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:test_application/homepage.dart';
 import 'package:test_application/loginpage.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:test_application/main.dart';
 import 'package:test_application/masterpage.dart';
-import 'package:test_application/signuppage.dart';
 
 class Splash extends StatefulWidget {
   const Splash({super.key});
@@ -26,7 +23,7 @@ class _SplashState extends State<Splash> {
     // }
 
     // Delay
-    Timer(Duration(milliseconds: 1500), navigateToApp);
+    Timer(Duration(milliseconds: 3000), navigateToApp);
   }
 
   void navigateToApp() {
@@ -40,12 +37,12 @@ class _SplashState extends State<Splash> {
   }
 
   void navigateToLoginPage() {
-    Navigator.pushReplacement(
+    Navigator.push(
         context, MaterialPageRoute(builder: (context) => LoginInPage()));
   }
 
   void navigateToHomePage() {
-    Navigator.pushReplacement(
+    Navigator.push(
         context,
         MaterialPageRoute(
             builder: (context) => MasterPage()));
