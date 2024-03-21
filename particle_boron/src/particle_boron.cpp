@@ -7,7 +7,6 @@
  */
 
 // Include Particle Device OS APIs
-#include <list>
 #include <stdlib.h>
 #include "Particle.h"
 #include "Base64RK.h"
@@ -43,46 +42,88 @@ void loop()
 
 int uploadEKGData(String cmd)
 {
-  const int size = 1000;
-  short ekgCounter = 0;
-  short ekgSignals[size];
+  const int size = 500;
+  size_t b_size = size*(3/2);
 
-  Serial.println("Collecting 1000 signals");
+  // Store ecg signals raw then in 4 bits form
+  unsigned short ekgSignals[size];
+  uint8_t binarySignals[b_size];  // Used to store binary data 
+
+
+  Serial.printf("Collecting %d signals\n", size);
+  int ekgCounter = 0;
   while (ekgCounter < size)
   {
 
-    short r = rand() % 4096;
-    // Serial.println(r);
+    unsigned short r = rand() % 4096; // Reading Sample
     ekgSignals[ekgCounter] = r;
 
-    delay(1); // Wait for a bit to keep serial data from saturating
+    delay(20); // Wait for a bit to keep serial data from saturating
     ekgCounter += 1;
   }
-  Serial.println("Finished collecting 1000 signals");
+  Serial.printf("Finished collecting %d signals\n", size);
 
 
   // Publish one half of the array
   // 1. encode half of the array to base64
-  size_t encodedLen = Base64::getEncodedSize(3, true);
-  char *encoded = new char[encodedLen];
-  uint8_t data[] = {50, 224, 208};
-  bool success = Base64::encode(data, 3, encoded, encodedLen, true);
 
-  if(success) {
+  // Convert short array into uint8_t array
+  // Track progress of byte array
+  size_t index = 0;
+  bool half_byte = false;
+
+  // Iterate through short array
+  for (int i=0; i<size; i++) {
+    unsigned short number =  ekgSignals[i];
+    // Extract (4 bits) x3 from short array
+    for (int j=0; j<3; j++) {
+      unsigned short n = number;
+      unsigned short mask = ~(~0 << 4);
+      uint8_t value = (n >> (2-j)*4) & mask; // Extract value of 4 bits from left to right
+
+      // Insert value into the byte_array
+      if (!half_byte) {
+        binarySignals[index] = value << 4; // Store left half of 4 bits
+        half_byte = !half_byte;
+      } else {
+        binarySignals[index] = binarySignals[index] | value; // Store right half of 4 bits
+        half_byte = !half_byte;
+        index++;
+      }
+    }
+  }
+  Serial.println("=======================================");
+  Serial.println(index);
+
+  // Encode binarySignals to base64
+  size_t encodedLen = Base64::getEncodedSize(b_size, true);
+  char *encoded = new char[encodedLen]; // Destination variable
+  bool success = Base64::encode(binarySignals, b_size, encoded, encodedLen, true); 
+  if (success) {
+    Serial.println("==================");
+    Serial.println(encodedLen);
     Serial.println(encoded);
-    Serial.println(data[1], BIN);
-    Serial.println(3734, BIN);
+    Particle.publish("Publish", encoded);
   } else {
     Serial.println("Something went wrong");
   }
-  
-  // for (int i = 0; i < ekgCounter; i++)
-  // {
-  //   Serial.println(ekgSignals[i]);
-  // }
 
-  // Serial.println("Amount of Readings: ");
-  // Serial.println(ekgCounter);
+  // int len = encodedLen/2;
+  // char *str1 = (char*)malloc(len +1);
+  // memcpy(str1, encoded, len);
+  // str1[len] = '\0';
+
+  // char *str2 = (char*)malloc(len +1);
+  // memcpy(str2, encoded + len, len);
+  // str2[len] = '\0';
+
+  // Particle.publish("Publish", str1);
+  // Particle.publish("Publish", str2);
+
+  // free(str1);
+  // free(str2);
+
+
   return 1;
 }
 
