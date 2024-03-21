@@ -10728,11 +10728,12 @@ class _HomePageState extends State<HomePage> {
 
     // Code to determine what week the report should be stored in
     DateTime date = DateTime.now();
-    // date = DateTime(2024,3,18,date.hour, date.minute, date.second);
+    // date = DateTime(2024,3,17,date.hour, date.minute, date.second);  // modify date
 
+    // Calculate week number based on date
     int weekOfYear = date.weekday == DateTime.sunday
-        ? date.difference(DateTime(date.year, 1, 1)).inDays ~/ 7
-        : date.difference(DateTime(date.year, 1, 1)).inDays ~/ 7 + 1;
+        ? date.difference(DateTime(date.year, 1, 1)).inDays ~/ 7 + 1
+        : date.difference(DateTime(date.year, 1, 1)).inDays ~/ 7;
 
     String weekDocId = weekOfYear.toString() + "_" + date.year.toString();
 
@@ -10758,7 +10759,6 @@ class _HomePageState extends State<HomePage> {
     final weekReport = <String, dynamic>{
       "warnings": 0,
     };
-
     if(!weekExists) {
       await db
         .collection("users_test")
