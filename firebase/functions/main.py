@@ -8,6 +8,27 @@ import google.cloud.firestore
 
 app = initialize_app()
 
+@db_fn.on_value_created(reference="/messages/{pushId}/original")
+def makeuppercase(event: db_fn.Event[Any]) -> None:
+    """Listens for new messages added to /messages/{pushId}/original and
+    creates an uppercase version of the message to /messages/{pushId}/uppercase
+    """
+
+    # Grab the value that was written to the Realtime Database.
+    original = event.data
+    if not isinstance(original, str):
+        print(f"Not a string: {event.reference}")
+        return
+
+    # Use the Admin SDK to set an "uppercase" sibling.
+    print(f"Uppercasing {event.params['pushId']}: {original}")
+    upper = original.upper()
+    parent = db.reference(event.reference).parent
+    if parent is None:
+        print("Message can't be root node.")
+        return
+    parent.child("uppercase").set(upper)
+
 # initialize_app()
 #
 #
