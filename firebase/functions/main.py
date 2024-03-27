@@ -9,7 +9,7 @@ import google.cloud.firestore
 app = initialize_app()
 
 @db_fn.on_value_created(reference="/messages/{pushId}/original")
-def makeuppercase(event: db_fn.Event[Any]) -> None:
+def makeuppercase(event: db_fn.Event[db_fn.Change]) -> None:
     """Listens for new messages added to /messages/{pushId}/original and
     creates an uppercase version of the message to /messages/{pushId}/uppercase
     """
