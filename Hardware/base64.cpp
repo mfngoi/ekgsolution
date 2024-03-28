@@ -56,9 +56,12 @@ int uploadEKGData(String cmd)
   {
 
     unsigned short r = rand() % 4096; // Reading Sample
+    if (ekgCounter == 0 || ekgCounter == 1 || ekgCounter == size-1 || ekgCounter == size-2) {
+      Serial.println(r);
+    }
     ekgSignals[ekgCounter] = r;
 
-    delay(20); // Wait for a bit to keep serial data from saturating
+    delay(2); // Wait for a bit to keep serial data from saturating
     ekgCounter += 1;
   }
   Serial.printf("Finished collecting %d signals\n", size);
@@ -103,7 +106,11 @@ int uploadEKGData(String cmd)
     Serial.println("==================");
     Serial.println(encodedLen);
     Serial.println(encoded);
-    Particle.publish("Publish", encoded);
+    Serial.println(ekgSignals[0]);
+    Serial.println(ekgSignals[1]);
+    Serial.println(ekgSignals[size-1]);
+    Serial.println(ekgSignals[size-2]);
+    Particle.publish("PublishTest", encoded);
   } else {
     Serial.println("Something went wrong");
   }
