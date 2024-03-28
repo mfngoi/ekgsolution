@@ -107,10 +107,8 @@ async def addsignals(event: db_fn.Event[db_fn.Change]) -> None:
 #     #     print("An error occurred:", error)
 
 
-# # https://us-central1-test-auth-eaf78.cloudfunctions.net/addmessage?text=uppercasemetoo
-    # https://us-central1-eureka-44973.cloudfunctions.net/addMessage?text=uppercasemetoo
-
-   # https://us-central1-eureka-44973.cloudfunctions.net/addmessage?text=uppercasemetoo
+# https://us-central1-test-auth-eaf78.cloudfunctions.net/addmessage?text=uppercasemetoo
+# https://us-central1-eureka-44973.cloudfunctions.net/addmessage?text=uppercasemetoo
         
 # # 100100000111
 # # 001010110110
