@@ -8,6 +8,7 @@
 
 // Include Particle Device OS APIs
 #include <stdlib.h>
+#include <string>
 #include "Particle.h"
 
 using namespace std;
@@ -72,7 +73,7 @@ int uploadEKGData(String cmd)
   string signals = data;
   string data = String::format("{ \"data\": \"%s\", \"uid\": \"%s\" }", signals.c_str(), uid.c_str());
   // Submit data
-  Particle.publish("PublishTest", data);  // Change to Publish or PublishTest
+  Particle.publish("Publish", data);  // Change to Publish or PublishTest
 
   return 1;
   }

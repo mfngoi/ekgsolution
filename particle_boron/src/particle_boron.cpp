@@ -8,9 +8,10 @@
 
 // Include Particle Device OS APIs
 #include <stdlib.h>
+#include <string>
 #include "Particle.h"
-#include "Base64RK.h"
 
+using namespace std;
 
 // Let Device OS manage the connection to the Particle Cloud
 SYSTEM_MODE(AUTOMATIC);
@@ -43,104 +44,35 @@ void loop()
 
 int uploadEKGData(String cmd)
 {
-  const int size = 500;
-  size_t b_size = size * (3 / 2);
+  const int size = 100;
 
   // Store ecg signals raw then in 4 bits form
   unsigned short ekgSignals[size];
-  uint8_t binarySignals[b_size]; // Used to store binary data
 
   Serial.printf("Collecting %d signals\n", size);
   int ekgCounter = 0;
   while (ekgCounter < size)
   {
-
     unsigned short r = rand() % 4096; // Reading Sample
-    Serial.println(r);
-    // if (ekgCounter == 0 || ekgCounter == 1 || ekgCounter == size - 1 || ekgCounter == size - 2)
-    // {
-    //   Serial.println(r);
-    // }
     ekgSignals[ekgCounter] = r;
 
-    delay(2); // Wait for a bit to keep serial data from saturating
+    delay(20); // Wait for a bit to keep serial data from saturating
     ekgCounter += 1;
   }
   Serial.printf("Finished collecting %d signals\n", size);
 
-  // Publish one half of the array
-  // 1. encode half of the array to base64
-
-  // Convert short array into uint8_t array
-  // Track progress of byte array
-  size_t index = 0;
-  bool half_byte = false;
-
-  // Iterate through short array
-  for (int i = 0; i < size; i++)
-  {
-    unsigned short number = ekgSignals[i];
-    // Extract (4 bits) x3 from short array
-    for (int j = 0; j < 3; j++)
-    {
-      unsigned short n = number;
-      unsigned short mask = ~(~0 << 4);
-      uint8_t value = (n >> (2 - j) * 4) & mask; // Extract value of 4 bits from left to right
-
-      // Insert value into the byte_array
-      if (!half_byte)
-      {
-        binarySignals[index] = value << 4; // Store left half of 4 bits
-        half_byte = !half_byte;
-      }
-      else
-      {
-        binarySignals[index] = binarySignals[index] | value; // Store right half of 4 bits
-        half_byte = !half_byte;
-        index++;
-      }
-    }
-  }
-  Serial.println("=======================================");
-  Serial.println(index);
-
-  // Encode binarySignals to base64
-  size_t encodedLen = Base64::getEncodedSize(b_size, true);
-  char *encoded = new char[encodedLen]; // Destination variable
-  bool success = Base64::encode(binarySignals, b_size, encoded, encodedLen, true);
-  if (success)
-  {
-    Serial.println("==================");
-    Serial.println(encodedLen);
-    Serial.println(encoded);
-
-    String uid = cmd;
-    String signals = encoded;
-
-    String data = String::format("{ \"data\": \"%s\", \"uid\": \"%s\" }", signals.c_str(), uid.c_str());
-
-    Particle.publish("PublishTest", data);
-  }
-  else
-  {
-    Serial.println("Something went wrong");
-    return 0;
+  string signals_data = "";
+  for (int i=0; i<size; i++) {
+    string num = to_string(ekgSignals[i]); // Convert to string
+    signals_data += num + ",";
   }
 
-  // int len = encodedLen/2;
-  // char *str1 = (char*)malloc(len +1);
-  // memcpy(str1, encoded, len);
-  // str1[len] = '\0';
-
-  // char *str2 = (char*)malloc(len +1);
-  // memcpy(str2, encoded + len, len);
-  // str2[len] = '\0';
-
-  // Particle.publish("Publish", str1);
-  // Particle.publish("Publish", str2);
-
-  // free(str1);
-  // free(str2);
+  // Create JSON
+  String uid = cmd;
+  // String signals = signals_data;
+  String data = String::format("{ \"data\": \"%s\", \"uid\": \"%s\" }", signals_data.c_str(), uid.c_str());
+  // Submit data
+  Particle.publish("Publish", data);  // Change to Publish or PublishTest
 
   return 1;
 }
