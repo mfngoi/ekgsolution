@@ -56,10 +56,11 @@ int uploadEKGData(String cmd)
   {
 
     unsigned short r = rand() % 4096; // Reading Sample
-    if (ekgCounter == 0 || ekgCounter == 1 || ekgCounter == size - 1 || ekgCounter == size - 2)
-    {
-      Serial.println(r);
-    }
+    Serial.println(r);
+    // if (ekgCounter == 0 || ekgCounter == 1 || ekgCounter == size - 1 || ekgCounter == size - 2)
+    // {
+    //   Serial.println(r);
+    // }
     ekgSignals[ekgCounter] = r;
 
     delay(2); // Wait for a bit to keep serial data from saturating
