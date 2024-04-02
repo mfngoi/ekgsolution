@@ -76,24 +76,6 @@ int uploadEKGData(String cmd)
   Particle.publish("Publish", data);  // Change to Publish or PublishTest
 
   return 1;
-  }
-
-  // int len = encodedLen/2;
-  // char *str1 = (char*)malloc(len +1);
-  // memcpy(str1, encoded, len);
-  // str1[len] = '\0';
-
-  // char *str2 = (char*)malloc(len +1);
-  // memcpy(str2, encoded + len, len);
-  // str2[len] = '\0';
-
-  // Particle.publish("Publish", str1);
-  // Particle.publish("Publish", str2);
-
-  // free(str1);
-  // free(str2);
-
-  return 1;
 }
 
 int doSomething(String cmd)
