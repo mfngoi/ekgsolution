@@ -53,8 +53,11 @@ int uploadEKGData(String cmd)
   int ekgCounter = 0;
   while (ekgCounter < size)
   {
-
     unsigned short r = rand() % 4096; // Reading Sample
+    Serial.println(r);
+    Serial.println(r, BIN);
+    Serial.println("======================");
+
     ekgSignals[ekgCounter] = r;
 
     delay(20); // Wait for a bit to keep serial data from saturating
@@ -62,18 +65,18 @@ int uploadEKGData(String cmd)
   }
   Serial.printf("Finished collecting %d signals\n", size);
 
-  string data = "";
+  string signals_data = "";
   for (int i=0; i<size; i++) {
     string num = to_string(ekgSignals[i]); // Convert to string
-    data = data + num + ","
+    signals_data += num + ",";
   }
 
   // Create JSON
-  string uid = cmd;
-  string signals = data;
-  string data = String::format("{ \"data\": \"%s\", \"uid\": \"%s\" }", signals.c_str(), uid.c_str());
+  String uid = cmd;
+  // String signals = signals_data;
+  String data = String::format("{ \"data\": \"%s\", \"uid\": \"%s\" }", signals_data.c_str(), uid.c_str());
   // Submit data
-  Particle.publish("Publish", data);  // Change to Publish or PublishTest
+  Particle.publish("PublishTest", data);  // Change to Publish or PublishTest
 
   return 1;
 }

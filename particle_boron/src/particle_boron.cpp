@@ -1,17 +1,13 @@
-/*
+/* 
  * Project myProject
  * Author: Your Name
- * Date:
+ * Date: 
  * For comprehensive documentation and examples, please visit:
  * https://docs.particle.io/firmware/best-practices/firmware-template/
  */
 
 // Include Particle Device OS APIs
-#include <stdlib.h>
-#include <string>
 #include "Particle.h"
-
-using namespace std;
 
 // Let Device OS manage the connection to the Particle Cloud
 SYSTEM_MODE(AUTOMATIC);
@@ -21,70 +17,57 @@ SYSTEM_THREAD(ENABLED);
 
 // Show system, cloud connectivity, and application logs over USB
 // View logs with CLI using 'particle serial monitor --follow'
-SerialLogHandler logHandler(LOG_LEVEL_INFO);
+SerialLogHandler logHandler(LOG_LEVEL_INFO); 
 
 // Forward declarations (functions used before they're implemented)
-int doSomething(String cmd);
 int uploadEKGData(String cmd);
 
-void setup()
-{
+void setup() {
 
-  // Particle functions
-  Particle.function("doSomething", doSomething);
-  Particle.function("uploadEKGData", uploadEKGData);
+    // Particle functions
+    Particle.function("uploadEKGData", uploadEKGData);
 
-  // initialize the serial communication:
-  Serial.begin(9600);
+    // initialize the serial communication:
+    Serial.begin(9600);
+    pinMode(D0, INPUT); // Setup for leads off detection LO +
+    pinMode(D1, INPUT); // Setup for leads off detection LO -
+
 }
 
-void loop()
-{
+void loop() {
+
 }
 
-int uploadEKGData(String cmd)
-{
-  const int size = 100;
+int uploadEKGData(String cmd) {
 
-  // Store ecg signals raw then in 4 bits form
-  unsigned short ekgSignals[size];
+    int ekgCounter = 0;
 
-  Serial.printf("Collecting %d signals\n", size);
-  int ekgCounter = 0;
-  while (ekgCounter < size)
-  {
-    unsigned short r = rand() % 4096; // Reading Sample
-    ekgSignals[ekgCounter] = r;
+    if (cmd == "3.3v") {
+        Serial.println("Printing 3.3v list of readings: ");
+    } else {
+        Serial.println("Printing 5v list of readings: ");
+    }
 
-    delay(20); // Wait for a bit to keep serial data from saturating
-    ekgCounter += 1;
-  }
-  Serial.printf("Finished collecting %d signals\n", size);
+    while(ekgCounter < 1000) {
+        if((digitalRead(D0) == 1)||(digitalRead(D1) == 1)){
+            Serial.println('-1');
+        }
+        else{
+            // send the value of analog input 0:
+            int output = analogRead(A0);            // Particle Boron 3.3v / 4095 units
 
-  string signals_data = "";
-  for (int i=0; i<size; i++) {
-    string num = to_string(ekgSignals[i]); // Convert to string
-    signals_data += num + ",";
-  }
-
-  // Create JSON
-  String uid = cmd;
-  // String signals = signals_data;
-  String data = String::format("{ \"data\": \"%s\", \"uid\": \"%s\" }", signals_data.c_str(), uid.c_str());
-  // Submit data
-  Particle.publish("Publish", data);  // Change to Publish or PublishTest
-
-  return 1;
-}
-
-int doSomething(String cmd)
-{
-  int result = 1;
-  Serial.println("doSomething triggered...");
-  if (cmd == "red")
-    Serial.println("Welcome to the matrix");
-  else if (cmd == "blue")
-    Serial.println("Turn away from the truths");
-
-  return result;
+            if (cmd == "3.3v") {
+                output = (1024*output)/4095;             // Arduino Pro Mini  5v / 1024 units
+                Serial.println(output);
+            } else {
+                Serial.println(output);
+            }
+        }
+        //Wait for a bit to keep serial data from saturating
+        delay(10);
+        ekgCounter += 1;
+    }
+    Serial.println("Amount of Readings: ");
+    Serial.println(ekgCounter);
+    return 1;
 }
