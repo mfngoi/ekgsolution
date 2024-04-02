@@ -62,13 +62,11 @@ def ecgClassify(profile, ecg_signals, model, encoders):
     # Format signal into numpy array    
     input_data_np = np.asarray(ecg_signals, dtype=np.float64)       # convert to type float64
     # print(f"{input_data_np=}")
-    # print(f"{input_data_np.shape=}")
-    # print(f"{input_data_np.dtype=}")
 
     # input_data_np = input_data_np / 4095        # normalize unit
 
     # Process signal / input_data using neurokit2
-    signals, info = nk.ecg_process(input_data_np, sampling_rate=1000)
+    signals, info = nk.ecg_process(input_data_np, sampling_rate=1000) # Change sampling rate
 
     # ECG Characteristics
     # avg_r_peak = avg_r_peak_reading(signals, info)

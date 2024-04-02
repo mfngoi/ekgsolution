@@ -44,42 +44,42 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyAu9vtj5QjYMYmWAohnum4ea7_mGRE0-pk',
-    appId: '1:1000594069805:web:06d963e849359d5ff19ba4',
-    messagingSenderId: '1000594069805',
-    projectId: 'eureka-44973',
-    authDomain: 'eureka-44973.firebaseapp.com',
-    databaseURL: 'https://eureka-44973-default-rtdb.firebaseio.com',
-    storageBucket: 'eureka-44973.appspot.com',
-    measurementId: 'G-DQHE1KSTZG',
+    apiKey: 'AIzaSyCRLEMKheZyN8l3Pc6kd-A9jNWPSNhBFdA',
+    appId: '1:878198376092:web:a38456bb7cee5aa6b90f59',
+    messagingSenderId: '878198376092',
+    projectId: 'test-auth-eaf78',
+    authDomain: 'test-auth-eaf78.firebaseapp.com',
+    databaseURL: 'https://test-auth-eaf78-default-rtdb.firebaseio.com',
+    storageBucket: 'test-auth-eaf78.appspot.com',
+    measurementId: 'G-P20NH5T3CD',
   );
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyDtU4qWeKSqZ4QMO1_BV1faJlWBTWnqc4w',
-    appId: '1:1000594069805:android:80052c90b1ec8decf19ba4',
-    messagingSenderId: '1000594069805',
-    projectId: 'eureka-44973',
-    databaseURL: 'https://eureka-44973-default-rtdb.firebaseio.com',
-    storageBucket: 'eureka-44973.appspot.com',
+    apiKey: 'AIzaSyAnhoiHFaCbhXZvSfuJV-cmgp9KCb8p4yQ',
+    appId: '1:878198376092:android:9211068e3173d10bb90f59',
+    messagingSenderId: '878198376092',
+    projectId: 'test-auth-eaf78',
+    databaseURL: 'https://test-auth-eaf78-default-rtdb.firebaseio.com',
+    storageBucket: 'test-auth-eaf78.appspot.com',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyDwIJtpnEXLehgSxRxSnVMLv0YhgO7Uimk',
-    appId: '1:1000594069805:ios:a433a59703cd0ac7f19ba4',
-    messagingSenderId: '1000594069805',
-    projectId: 'eureka-44973',
-    databaseURL: 'https://eureka-44973-default-rtdb.firebaseio.com',
-    storageBucket: 'eureka-44973.appspot.com',
+    apiKey: 'AIzaSyCY-OSOyKRG16m8SMHU_qkobSRG9S48ZrQ',
+    appId: '1:878198376092:ios:5aff9e32a0cd7b83b90f59',
+    messagingSenderId: '878198376092',
+    projectId: 'test-auth-eaf78',
+    databaseURL: 'https://test-auth-eaf78-default-rtdb.firebaseio.com',
+    storageBucket: 'test-auth-eaf78.appspot.com',
     iosBundleId: 'com.example.flutterApplication',
   );
 
   static const FirebaseOptions macos = FirebaseOptions(
-    apiKey: 'AIzaSyDwIJtpnEXLehgSxRxSnVMLv0YhgO7Uimk',
-    appId: '1:1000594069805:ios:1533c92f474d3bfef19ba4',
-    messagingSenderId: '1000594069805',
-    projectId: 'eureka-44973',
-    databaseURL: 'https://eureka-44973-default-rtdb.firebaseio.com',
-    storageBucket: 'eureka-44973.appspot.com',
+    apiKey: 'AIzaSyCY-OSOyKRG16m8SMHU_qkobSRG9S48ZrQ',
+    appId: '1:878198376092:ios:3862c162526c974eb90f59',
+    messagingSenderId: '878198376092',
+    projectId: 'test-auth-eaf78',
+    databaseURL: 'https://test-auth-eaf78-default-rtdb.firebaseio.com',
+    storageBucket: 'test-auth-eaf78.appspot.com',
     iosBundleId: 'com.example.flutterApplication.RunnerTests',
   );
 }

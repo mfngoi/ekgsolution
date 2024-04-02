@@ -1,6 +1,7 @@
 {
   "project_info": {
     "project_number": "878198376092",
+    "firebase_url": "https://test-auth-eaf78-default-rtdb.firebaseio.com",
     "project_id": "test-auth-eaf78",
     "storage_bucket": "test-auth-eaf78.appspot.com"
   },

@@ -50,10 +50,4 @@ print(f"Count: {count}")
 # daysDiff = (date - startDay).days
 # print(f"{daysDiff=}")
 
-
-# if date.weekday == 6:
-#     weekNum = daysDiff // 7 + 1
-# else: 
-#     weekNum = daysDiff // 7
-# print(f"{weekNum}")
     

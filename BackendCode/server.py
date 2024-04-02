@@ -59,7 +59,8 @@ def ekgClassify():
 
     # Handling signals
     ecg_signals = request.form['signals']
-    ecg_signals = ecg_signals.split(', ')
+    ecg_signals = ecg_signals.split(',')
+    ecg_signals.pop() # Clean end of signal (loose string)
 
     # Get condition in result
     result = ecgClassify(profile, ecg_signals, ecgClassifier, encoders)

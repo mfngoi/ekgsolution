@@ -192,8 +192,8 @@ class _SignUpPageState extends State<SignUpPage> {
     DateTime date = DateTime.now();
 
     int weekOfYear = date.weekday == DateTime.sunday
-        ? date.difference(DateTime(date.year, 1, 1)).inDays ~/ 7
-        : date.difference(DateTime(date.year, 1, 1)).inDays ~/ 7 + 1;
+        ? date.difference(DateTime(date.year, 1, 1)).inDays ~/ 7 + 1
+        : date.difference(DateTime(date.year, 1, 1)).inDays ~/ 7;
 
     String weekDocId = weekOfYear.toString() + "_" + date.year.toString();
 

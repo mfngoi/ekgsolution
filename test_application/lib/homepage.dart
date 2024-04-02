@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:test_application/main.dart';
@@ -30,7 +31,7 @@ class _HomePageState extends State<HomePage> {
 
   Future<Map> getNewsInfo() async {
     try {
-      String urlLink = "http://localhost:5000/newsinfo";
+      String urlLink = "http://34.217.80.158:5000/newsinfo";
       // Define destination link
       Uri link = Uri.parse(urlLink);
 
@@ -49,18 +50,112 @@ class _HomePageState extends State<HomePage> {
     return {};
   }
 
-  Future<String> triggerDevice() async {
-    String link = "https://api.particle.io/v1/devices/e00fce684219e0e249d5bc42/uploadEKGData?access_token=40c9617030f65832904eb99528de3da5e7ebfe66";
+  // Fork between trigger device or send alert
+  void DiagnoseFunction() async {
+
+    if (await checkUserDataAlert()) {
+      triggerDevice(); 
+    } else {
+      showUserDataAlert(context);
+    }
+  }
+
+  // Will notify user to fill out data before diagnose
+  Future<bool> checkUserDataAlert() async {
+
+    // Query for user data
+    final db = await FirebaseFirestore.instance; // Connect to database
+
+    final user_data = await db
+        .collection("users_test")
+        .doc(user.uid)
+        .get()
+        .then(
+      (DocumentSnapshot doc) {
+        final data = doc.data() as Map<String, dynamic>;
+        // print(data);
+        return data;
+      },
+      onError: (e) => print("Error completing: $e"),
+    );
+
+    // print(user_data);
+    
+    if (user_data["age"] == 0 ) {
+      print("Must fill out age");
+      return false;
+    }
+    if (user_data["sex"] == "?" ) {
+      print("Must fill out sex");
+      return false;
+    }
+    if (user_data["race"] == "?" ) {
+      print("Must fill out race");
+      return false;
+    }
+    if (user_data["height"] == 0 ) {
+      print("Must fill out height");
+      return false;
+    }
+    if (user_data["weight"] == 0 ) {
+      print("Must fill out weight");
+      return false;
+    }
+
+    print("Profile data is valid...");
+    return true;
+  }
+
+  // Displays Alert Box on screen
+  void showUserDataAlert(BuildContext context) {
+    // set up the buttons
+    Widget okButton = TextButton(
+      child: Text("OK"),
+      onPressed: () {
+        Navigator.of(context).pop(); // dismiss dialog alert
+      },
+    );
+
+    // set up AlertDialog
+    CupertinoAlertDialog alert = CupertinoAlertDialog(
+      title: Text("Profile Incomplete!"),
+      content: Text(
+          "Navigate to the \"About Me\" page and fill out your information to begin diagnosis."),
+      actions: <Widget>[
+        okButton,
+      ],
+    );
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return alert;
+      },
+    );
+  }
+
+  Future<int> triggerDevice() async {
+    print(user.uid);
+    print("Attempting connection to device...");
+
+    String link =
+        "https://api.particle.io/v1/devices/e00fce684219e0e249d5bc42/uploadEKGData?access_token=40c9617030f65832904eb99528de3da5e7ebfe66";
 
     Map data = {
       "args": user.uid,
     };
     var body = json.encode(data);
 
+    var response = await http.post(Uri.parse(link),
+        headers: {"Content-Type": "application/json"}, body: body);
 
-    var response = await http.post(Uri.parse(link), headers: {"Content-Type": "application/json"}, body: body);
+    // Improved exit for trigger device
+    if (response.statusCode == 200) {
+      print("Triggered device...");
+      return 1;
+    }
 
-    return "Sent Request";
+    return 0;
   }
 
   void SubmitSampleReports() async {
@@ -10711,29 +10806,6 @@ class _HomePageState extends State<HomePage> {
       "qt_interval": 317,
     };
 
-    // http.Response result = await http.post(
-    //   Uri.parse("http://localhost:5000/ekgclassify"),
-    //   headers: {"Content-Type": "application/json"}, // "application/x-www-form-urlencoded"
-    //   // encoding: Encoding.getByName('utf-8'),
-    //   body: jsonEncode({'name': 'John Doe', 'email': 'john@example.com'}),
-    //     // {
-    //     //   {'name': 'matt'},
-    //     //   {'age': 23},
-    //     //   // 'profile': jsonEncode(
-    //     //   //   {
-    //     //   //     "sex": "M",
-    //     //   //     "age": 23,
-    //     //   //     "height": 180.5,
-    //     //   //     "weight": 67.8,
-    //     //   //     "ethnicity": "ASIAN"
-    //     //   //   },
-    //     //   // ),
-    //     //   // 'signals': [1, 2, 3, 4, 5, 6], //report1["signals"],
-    //     // },
-    //   );
-    // print(result.statusCode);
-    // print(result.body);
-
     // Code to determine what week the report should be stored in
     DateTime date = DateTime.now();
     // date = DateTime(2024,3,17,date.hour, date.minute, date.second);  // modify date
@@ -10755,7 +10827,7 @@ class _HomePageState extends State<HomePage> {
         .then(
       (querySnapshot) {
         for (var docSnapshot in querySnapshot.docs) {
-          if(docSnapshot.id == weekDocId) {
+          if (docSnapshot.id == weekDocId) {
             return true;
           }
         }
@@ -10767,13 +10839,13 @@ class _HomePageState extends State<HomePage> {
     final weekReport = <String, dynamic>{
       "warnings": 0,
     };
-    if(!weekExists) {
+    if (!weekExists) {
       await db
-        .collection("users_test")
-        .doc(user.uid)
-        .collection("weekly_reports") // create colletion for weeks
-        .doc(weekDocId)
-        .set(weekReport); // Add warnings field
+          .collection("users_test")
+          .doc(user.uid)
+          .collection("weekly_reports") // create colletion for weeks
+          .doc(weekDocId)
+          .set(weekReport); // Add warnings field
     }
 
     await db
@@ -10839,7 +10911,9 @@ class _HomePageState extends State<HomePage> {
           backgroundColor: MaterialStateProperty.all<Color>(Colors.purple),
           foregroundColor: MaterialStateProperty.all<Color>(Colors.white),
         ),
-        onPressed: triggerDevice,
+        onPressed: () {
+          DiagnoseFunction();
+        },
         child: Text(
           "Diagnose Now",
           textAlign: TextAlign.center,
