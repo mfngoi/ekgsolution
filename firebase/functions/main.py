@@ -7,9 +7,6 @@ import google.cloud.firestore
 
 # Other modules
 from datetime import datetime
-import base64
-import bitarray
-import struct
 
 app = initialize_app()
 
@@ -51,29 +48,13 @@ def makeuppercase(event: firestore_fn.Event[firestore_fn.DocumentSnapshot | None
     upper = original.upper()
     event.data.reference.update({"uppercase": upper})
 
-@db_fn.on_value_created(reference="/particletest/{pushId}")
+@db_fn.on_value_created(reference="/particle/{pushId}") # Change to database
 def addsignals(event: db_fn.Event[db_fn.Change]) -> None:
 
     # Access data
     data = event.data
     # print("Access dictionary attempt")
     # print(f"{data=}")
-
-    # Decode signals base64 into "signals"
-    # base64_string = data["json"]["signals"]
-    # sample_string_bytes = base64.b64decode(base64_string)
-    # b_array = bitarray.bitarray()
-    # b_array = b_array.frombytes(sample_string_bytes)
-    # print(f"{b_array}")
-
-    # signals = []    # Array to store decoded values
-    # for i in range(len(b_array)//12):
-    #     start_idx = i * 12
-    #     end_idx = (i+1) * 12
-    #     # print(f"{b_array[start_idx:end_idx]=}")
-    #     num_bits = bitarray.bitarray(b_array[start_idx : end_idx].to01() + ("0"*20), endian='little')
-    #     num = struct.unpack("<L", num_bits)[0]
-    #     signals.append(num)
 
     # Get correct week number
     date = datetime.now()
@@ -95,21 +76,30 @@ def addsignals(event: db_fn.Event[db_fn.Change]) -> None:
         "signals": data["json"]["signals"],
     }
 
+
+    # Submit signals and user info to ecg server (classifier)
+    # Gather user info (userID)
+    # Send a post request to the server
+    # Get backs results
+    # Store results with raw signals into db
+
     # Connect to database
     firestore_client: google.cloud.firestore.Client = firestore.client()
 
     # Check if weekly_reports document exists
-    doc = firestore_client.collection("users").document(userID).collection("weekly_reports").document(weekID).get()
+    doc = firestore_client.collection("Users").document(userID).collection("weekly_reports").document(weekID).get()
+    # Change to users
 
     # Add week if it does not exists
     if not doc.exists:
         print(f"{weekID} did not exist, creating document... ")
-        firestore_client.collection("users").document(userID).collection("weekly_reports").document(weekID).set({"warnings": 0})
+        firestore_client.collection("Users").document(userID).collection("weekly_reports").document(weekID).set({"warnings": 0}) 
+        # Change to users
 
     # Push document to database
     print(f"Added report: {reportID} to user db... ")
-    firestore_client.collection("users").document(userID).collection("weekly_reports").document(weekID).collection("reports").document(reportID).set(entry)
-
+    firestore_client.collection("Users").document(userID).collection("weekly_reports").document(weekID).collection("reports").document(reportID).set(entry) 
+    # Change to users
 
 
 # https://us-central1-test-auth-eaf78.cloudfunctions.net/addmessage?text=uppercasemetoo

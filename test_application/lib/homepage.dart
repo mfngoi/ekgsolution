@@ -50,8 +50,16 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future<String> triggerDevice() async {
-    await http.post(Uri.parse(
-        'https://api.particle.io/v1/devices/e00fce684219e0e249d5bc42/readECG?access_token=40c9617030f65832904eb99528de3da5e7ebfe66'));
+    String link = "https://api.particle.io/v1/devices/e00fce684219e0e249d5bc42/uploadEKGData?access_token=40c9617030f65832904eb99528de3da5e7ebfe66";
+
+    Map data = {
+      "args": user.uid,
+    };
+    var body = json.encode(data);
+
+
+    var response = await http.post(Uri.parse(link), headers: {"Content-Type": "application/json"}, body: body);
+
     return "Sent Request";
   }
 
@@ -10831,7 +10839,7 @@ class _HomePageState extends State<HomePage> {
           backgroundColor: MaterialStateProperty.all<Color>(Colors.purple),
           foregroundColor: MaterialStateProperty.all<Color>(Colors.white),
         ),
-        onPressed: SubmitSampleReports,
+        onPressed: triggerDevice,
         child: Text(
           "Diagnose Now",
           textAlign: TextAlign.center,
