@@ -60,7 +60,7 @@ int uploadEKGData(String cmd)
 
     ekgSignals[ekgCounter] = r;
 
-    delay(20); // Wait for a bit to keep serial data from saturating
+    delay(50); // Wait for a bit to keep serial data from saturating
     ekgCounter += 1;
   }
   Serial.printf("Finished collecting %d signals\n", size);
