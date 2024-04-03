@@ -46,12 +46,7 @@ def newsInfo():
 def ekgClassify():
 
     # data = json.loads(request.form)
-
     # print(request.form)
-    # print(request.form.keys())
-    # print(request.data)
-    # print(request.values)
-    # print(request.json)
 
     # Handling profile
     profile = request.form['profile'] # Extract contents of profile key
@@ -63,10 +58,10 @@ def ekgClassify():
     ecg_signals.pop() # Clean end of signal (loose string)
 
     # Get condition in result
-    result = ecgClassify(profile, ecg_signals, ecgClassifier, encoders)
-    print(f"{result}")
+    results = ecgClassify(profile, ecg_signals, ecgClassifier, encoders)
+    results = json.dumps(results)
     
-    return result
+    return results
 
 if __name__ == '__main__': # Runs app when the program is started
     app.run(host='0.0.0.0', debug=True, port=5000)

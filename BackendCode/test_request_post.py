@@ -23,7 +23,18 @@ new_data = {
 }
 
 # A POST request to tthe API
-post_response = requests.post(url_post, headers=head, data=new_data)
+response = requests.post(url_post, headers=head, data=new_data)
 
+print(response)
 # Print the response
-print(post_response.text)
+print(response.text)
+
+data = json.loads(response.text)
+print(f"{data['condition']=}")
+print(f"{data['avg_heartbeat']=}")
+print(f"{data['pr_interval']=}")
+print(f"{data['qt_interval']=}")
+
+
+# response = json.loads(response)
+# print(f"{response=}")

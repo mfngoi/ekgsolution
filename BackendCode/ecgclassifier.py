@@ -1,4 +1,5 @@
 import math
+import json
 import numpy as np
 import neurokit2 as nk
 
@@ -66,7 +67,7 @@ def ecgClassify(profile, ecg_signals, model, encoders):
     # input_data_np = input_data_np / 4095        # normalize unit
 
     # Process signal / input_data using neurokit2
-    signals, info = nk.ecg_process(input_data_np, sampling_rate=20) # Change sampling rate (min: 500 readings / 10 sec or 100 readings / 5 sec)
+    signals, info = nk.ecg_process(input_data_np, sampling_rate=20) # Change sampling rate (min: 500 readings / 10 sec or 100 readings / 5 secs
 
     # ECG Characteristics
     # avg_r_peak = avg_r_peak_reading(signals, info)
@@ -76,10 +77,10 @@ def ecgClassify(profile, ecg_signals, model, encoders):
     # Human Characteristics
     # condition = ['Placebo']
     sex = profile['sex']
-    age = profile['age']
-    height = profile['height']
-    weight = profile['weight']
-    ethnicity = profile['ethnicity']
+    age = float(profile['age'])
+    height = float(profile['height'])
+    weight = float(profile['weight'])
+    ethnicity = profile['race']
 
     # Encode or numerize columns
     # condition = condition_encoder.transform(condition)
@@ -94,5 +95,23 @@ def ecgClassify(profile, ecg_signals, model, encoders):
     # Get prediction
     condition_encoded = model.predict([my_data])
     condition = encoders['condition'].inverse_transform(condition_encoded)[0]    # Decode and extract from array
-    
-    return condition
+
+    # Get Average Heartbeats
+    heartbeats = nk.ecg_segment(signals, rpeaks=info["ECG_R_Peaks"], sampling_rate=info["sampling_rate"], show=False)
+    epochs_heartbeats = nk.epochs.epochs_to_df(heartbeats)
+
+    # Calculate average ecg values by time 
+    heartbeats = epochs_heartbeats.groupby("Time")[["ECG_Clean"]].mean()
+    # print(f"{mean_heartbeat=}")
+    avg_heartbeat = heartbeats["ECG_Clean"].tolist()
+    print(f"{avg_heartbeat=}")
+
+
+    results = {
+        "condition": condition,
+        "avg_heartbeat": avg_heartbeat,
+        "pr_interval": avg_pr_interval,
+        "qt_interval": avg_qt_interval,
+    }
+
+    return results
