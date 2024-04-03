@@ -66,7 +66,7 @@ def ecgClassify(profile, ecg_signals, model, encoders):
     # input_data_np = input_data_np / 4095        # normalize unit
 
     # Process signal / input_data using neurokit2
-    signals, info = nk.ecg_process(input_data_np, sampling_rate=1000) # Change sampling rate
+    signals, info = nk.ecg_process(input_data_np, sampling_rate=20) # Change sampling rate (min: 500 readings / 10 sec or 100 readings / 5 sec)
 
     # ECG Characteristics
     # avg_r_peak = avg_r_peak_reading(signals, info)
