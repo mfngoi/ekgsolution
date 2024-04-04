@@ -46,7 +46,7 @@ void loop()
 
 int uploadEKGData(String cmd)
 {
-  const int size = 100;
+  const int size = 200;
 
   // Store ecg signals raw then in 4 bits form
   unsigned short ekgSignals[size];

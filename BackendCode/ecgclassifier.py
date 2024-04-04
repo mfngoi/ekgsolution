@@ -60,14 +60,14 @@ def avg_qt_interval_reading(signals, info):
 # will return a type of condition or a normal condition
 def ecgClassify(profile, ecg_signals, model, encoders):
 
-    # Format signal into numpy array    
-    input_data_np = np.asarray(ecg_signals, dtype=np.float64)       # convert to type float64
+    # # Format signal into numpy array    
+    # input_data_np = np.asarray(ecg_signals, dtype=np.int64)       # convert to type float64
     # print(f"{input_data_np=}")
 
-    # input_data_np = input_data_np / 4095        # normalize unit
+    # # input_data_np = input_data_np / 4095        # normalize unit
 
     # Process signal / input_data using neurokit2
-    signals, info = nk.ecg_process(input_data_np, sampling_rate=20) # Change sampling rate (min: 500 readings / 10 sec or 100 readings / 5 secs
+    signals, info = nk.ecg_process(ecg_signals, sampling_rate=20) # Change sampling rate (min: 500 readings / 10 sec or 100 readings / 5 secs
 
     # ECG Characteristics
     # avg_r_peak = avg_r_peak_reading(signals, info)

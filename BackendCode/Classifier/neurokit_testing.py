@@ -1,14 +1,53 @@
 import matplotlib.pyplot as plt
 import neurokit2 as nk
 from neurokit2.epochs import epochs_to_df
-from csv_process import avg_pr_interval_reading, avg_qt_interval_reading
 import pandas as pd
 import numpy as np
+import math
+
+# Process sample for average pr interval
+def avg_pr_interval_reading(signals, info):
+
+    # Find values of all pr_intervals in reading
+    pr_interval_values = []
+    print(f"{info['ECG_P_Onsets']=}")
+    print(f"{info['ECG_R_Onsets']=}")
+    for beat in range(len(info['ECG_P_Onsets'])):
+        p_onset = info['ECG_P_Onsets'][beat]
+        r_onset = info['ECG_R_Onsets'][beat]
+        if not math.isnan(p_onset) and not math.isnan(r_onset):
+            pr_interval_values.append(r_onset - p_onset)
+    # print(f"{pr_interval_values=}")
+        
+    # Calculate and save average
+    total = sum(pr_interval_values)
+    avg_pr_interval = round(total/len(pr_interval_values))    
+
+    return avg_pr_interval
+
+# Process sample for average Q-Peak to T-Offset interval
+def avg_qt_interval_reading(signals, info):
+
+    # Find values of all qt_intervals in reading
+    qt_interval_values = []
+    for beat in range(len(info['ECG_Q_Peaks'])):
+        q_peak = info['ECG_Q_Peaks'][beat]
+        t_offset = info['ECG_T_Offsets'][beat]
+        if not math.isnan(q_peak) and not math.isnan(t_offset):
+            qt_interval_values.append(t_offset - q_peak)
+    # print(qt_interval_values)
+        
+    # Calculate and save average
+    total = sum(qt_interval_values)
+    avg_qt_interval = round(total/len(qt_interval_values))       
+
+    return avg_qt_interval
+
 
 # Get 10,000 reading sample from file
 input_data = []
-with open("target/heartsample_5v_03.log", 'r') as file:
-    while len(input_data) < 10000:
+with open("target/heartsample_5v_100_5sec_03.log", 'r') as file:
+    while len(input_data) < 100:
         line = file.readline().strip()
         if line.isdigit():
             input_data.append(int(line))
@@ -17,12 +56,12 @@ with open("target/heartsample_5v_03.log", 'r') as file:
 
 # Standardize data
 print(f"{input_data=}")
-input_data_np = np.asarray(input_data)
+input_data_np = np.asarray(input_data, dtype=np.float64)       # convert to type float64
 # input_data_np = input_data_np / 4095      # Convert voltages to 0-1 units
 # print(input_data_np)
 
 # Process ecg
-ecg_signals, info = nk.ecg_process(input_data_np, sampling_rate=1000)
+ecg_signals, info = nk.ecg_process(input_data_np, sampling_rate=20)
 print(ecg_signals)
 # print(ecg_signals.columns)
 # ecg_signals['ECG_P_Offsets'].to_csv('hello.csv')
@@ -36,6 +75,7 @@ print(f"{avg_qt=}")
 
 # Examine plot (Displays ecg analysis overview)s
 nk.ecg_plot(ecg_signals, info)
+plt.show()
 
 # Segments each heart beat from our ecg_signals
 # 1 heartbeat segment per R-Peaks

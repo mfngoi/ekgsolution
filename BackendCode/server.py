@@ -1,6 +1,7 @@
 import flask
 import pickle
 import json
+import numpy as np
 from flask import request
 from news_data import news_data
 from ecgclassifier import ecgClassify
@@ -57,8 +58,16 @@ def ekgClassify():
     ecg_signals = ecg_signals.split(',')
     ecg_signals.pop() # Clean end of signal (loose string)
 
+    print(f"{ecg_signals=}")
+
+    # Format signal into numpy array    
+    input_data_np = np.asarray(ecg_signals, dtype=np.float64)       # convert to type float64
+    print(f"{input_data_np=}")
+
+    input_data_np = input_data_np / 4095        # normalize unit
+
     # Get condition in result
-    results = ecgClassify(profile, ecg_signals, ecgClassifier, encoders)
+    results = ecgClassify(profile, input_data_np, ecgClassifier, encoders)
     results = json.dumps(results)
     
     return results

@@ -4,6 +4,8 @@ from firebase_functions import firestore_fn, https_fn, db_fn
 # The Firebase Admin SDK to access Cloud Firestore.
 from firebase_admin import initialize_app, firestore, db
 import google.cloud.firestore
+import requests
+import json
 
 # Other modules
 from datetime import datetime
@@ -72,19 +74,29 @@ def addsignals(event: db_fn.Event[db_fn.Change]) -> None:
     weekID = "week" + str(weekNum)
     reportID = str(date)
 
-    entry = {
+    # Connect to database
+    firestore_client: google.cloud.firestore.Client = firestore.client()
+
+    # Submit signals and user info to ecg server (classifier)
+    url_post = "http://18.223.255.251:5000/classifier"
+
+    head = {
+        "Content-Type": "application/x-www-form-urlencoded",
+    }
+
+    # Gather user info (userID)
+    doc = firestore_client.collection("Users").document(userID).get()
+    profile = doc.to_dict()
+    profile = json.dumps(profile)
+
+    new_data = {
+        "profile": profile,
         "signals": data["json"]["signals"],
     }
 
+    response = requests.post(url_post, headers=head, data=new_data)
 
-    # Submit signals and user info to ecg server (classifier)
-    # Gather user info (userID)
-    # Send a post request to the server
-    # Get backs results
-    # Store results with raw signals into db
-
-    # Connect to database
-    firestore_client: google.cloud.firestore.Client = firestore.client()
+    results = json.loads(response.text)
 
     # Check if weekly_reports document exists
     doc = firestore_client.collection("Users").document(userID).collection("weekly_reports").document(weekID).get()
@@ -97,9 +109,15 @@ def addsignals(event: db_fn.Event[db_fn.Change]) -> None:
         # Change to users
 
     # Push document to database
+    entry = {
+        "signals": data["json"]["signals"],
+        "prediction": results["prediction"],
+        "avg_heartbeat": results["avg_heart"],
+        "avg_p_wave": results["avg_p_wave"],
+        "avg_qt_interval": results["avg_qt_interval"],
+    }
     print(f"Added report: {reportID} to user db... ")
     firestore_client.collection("Users").document(userID).collection("weekly_reports").document(weekID).collection("reports").document(reportID).set(entry) 
-    # Change to users
 
 
 # https://us-central1-test-auth-eaf78.cloudfunctions.net/addmessage?text=uppercasemetoo
