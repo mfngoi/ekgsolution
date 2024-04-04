@@ -36,6 +36,8 @@ void setup()
 
   // initialize the serial communication:
   Serial.begin(9600);
+  pinMode(D0, INPUT); // Setup for leads off detection LO +
+  pinMode(D1, INPUT); // Setup for leads off detection LO -
 }
 
 void loop()
@@ -53,12 +55,15 @@ int uploadEKGData(String cmd)
   int ekgCounter = 0;
   while (ekgCounter < size)
   {
-    unsigned short r = rand() % 4096; // Reading Sample
-    Serial.println(r);
-    Serial.println(r, BIN);
-    Serial.println("======================");
 
-    ekgSignals[ekgCounter] = r;
+    if((digitalRead(D0) == 1)||(digitalRead(D1) == 1)){
+      ekgSignals[ekgCounter] = -1;
+      Serial.println(-1);
+    } else {
+      unsigned short output = analogRead(A0);
+      ekgSignals[ekgCounter] = output;
+      Serial.println(output);
+    }
 
     delay(50); // Wait for a bit to keep serial data from saturating
     ekgCounter += 1;
