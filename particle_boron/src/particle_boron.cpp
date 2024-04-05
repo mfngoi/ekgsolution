@@ -46,7 +46,7 @@ void loop()
 
 int uploadEKGData(String cmd)
 {
-  const int size = 200;
+  const int size = 100;
 
   // Store ecg signals raw then in 4 bits form
   unsigned short ekgSignals[size];
@@ -81,7 +81,7 @@ int uploadEKGData(String cmd)
   // String signals = signals_data;
   String data = String::format("{ \"data\": \"%s\", \"uid\": \"%s\" }", signals_data.c_str(), uid.c_str());
   // Submit data
-  Particle.publish("PublishTest", data);  // Change to Publish or PublishTest
+  Particle.publish("Publish", data);  // Change to Publish or PublishTest
 
   return 1;
 }
