@@ -3,7 +3,7 @@ from datetime import datetime
 import bitarray
 import struct
 
-data = "UQaTy3l+2ZqC4NlP5hb35hlXD1us1S9JT2pJjN/9vm6RI3MNeUikbUU3tRdcseNxoW+31xG5NKGJIrR778XdrWxohdeI/8gTSg6uK252PsvixR+OSAMECSXpxLiecHul26IVGlfrA8mPg1YNaq0UjQYJP225M52sxQKNd/MzTbv30hQxjSpgeEcmeB6eOnmFVfcRpYiYq1mua8dc43zVMvhGijbtNJzVqdKRn3DAY+LiK3/50CywYBCT+e2V9NiLqZWJgH4vbmGPKI1ow9K1vRapnpt773uBVBqUKTIqmuxlwxMT+qjffgrG13hrgMW+fVT/vHvxHyNzUOWXSRiR1iLYO8UxrMNNNDhPoIFbtZ2FG18OJz07XZdf9OoFB020/6/NtS/Hf01FXilzKpKCA2A19AAgdMMGIX0GbgRz2JUW9n4gH2TgPRAoMb2VdHGQEUROgkskUGCnczlr78vEId55KQppomcjXK434LIv8otJNcFeijQnI30yvNXiIwL8H4UOmMLhFFn9U86N9tKoE5tWuFMRpulCQiVIZ+0/1IA86TYByrQWJYH0GZOdt5cprqf3nEYffXaAi7NHKwOCnVsQV7fH/QaorK4z/Aan+lmFjoGbjfzJ2zFp00qrK/DRlDSCYKwfjylJxqMkavKXc7gfoYE="
+data = "hEjMhykClBlqoEnWn7ognqpFnKiwhoeoc/bWZea1ZsZcaeYjaPaCZXapZKbDa9awaIYRaOZ9aFaUZfbZaMZia1ZbbAZ0Z4bZbEeWdtdledbtddbUbHeUckewmO7Z+j8YY0d8f5gxfGhbhZhlj2hPioioismolin0pRpMrmpsplo9mVnfj/jbiBe2dmdWbuddcGbob7aHbwbrakbzZXbFawaSbRaIbXbaZtagZUaxZ1Y8awZIbAZlZGbGaJcecYcIc3bYdGb3bfdTYzh/1T+k+ZXichdrdCgBeEhkgsgJijg1jPjBjWmQk+nBndmfozm+nQnHknlLiHhLhPfkh4hRfKhNfwegeJcAdScPboc1bTbwbDahcJbhdhdMcIcka3cPbIbUcCazcTbQaZbfaTbdbncFeldWfEcbcOeebwfsfRdoh8xI+o+lpjcXeQfLe7fViGhBiwh6g4jTh8jflOk1nOmZnFn3mEoXnJnWl7iEfVd5aQarZTZuacZ+bQaNZRbRaQcPcJcGdKbRbraXZwaVaEcIbYaib8avb/awbbdHcEeddJcodkbbdgcAdjgye8jEhjg8jggojJigiCjyfeql+e+p+Wc+gnhggnjnidjykojck7j8kdmgmwmAlojxmOkijqimfegfe2dHcqaEbKaUZvauZjY="
 data = data.strip()
 
 decoded_bytes = base64.b64decode(data)
@@ -35,19 +35,5 @@ print(f"Count: {count}")
 # 111111110111
 # 000110001001
 
-
-
-
-
-
-
-
-
-# date = datetime.now()
-# print(f"{str(date)=}")
-# weekNum = 0
-# startDay = datetime(date.year, 1, 1)
-# daysDiff = (date - startDay).days
-# print(f"{daysDiff=}")
 
     

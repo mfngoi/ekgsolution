@@ -101,24 +101,32 @@ def addsignals(event: db_fn.Event[db_fn.Change]) -> None:
     # Check if weekly_reports document exists
     doc = firestore_client.collection("Users").document(userID).collection("weekly_reports").document(weekID).get()
     # Change to users
-
+    warnings = 0
     # Add week if it does not exists
     if not doc.exists:
         print(f"{weekID} did not exist, creating document... ")
-        firestore_client.collection("Users").document(userID).collection("weekly_reports").document(weekID).set({"warnings": 0}) 
+        firestore_client.collection("Users").document(userID).collection("weekly_reports").document(weekID).set({"warnings": warnings}) 
+    else:
+        warnings = int(doc.to_dict()["warnings"])
         # Change to users
 
     # Push document to database
     entry = {
         "signals": data["json"]["signals"],
         "prediction": results["prediction"],
-        "avg_heartbeat": results["avg_heart"],
+        "avg_heartbeat": results["avg_heartbeat"],
         "avg_p_wave": results["avg_p_wave"],
         "avg_qt_interval": results["avg_qt_interval"],
     }
     print(f"Added report: {reportID} to user db... ")
-    firestore_client.collection("Users").document(userID).collection("weekly_reports").document(weekID).collection("reports").document(reportID).set(entry) 
 
+    # increment warnings in database if p waves and qt intervals are abnormal
+    if results["prediction"] != "Placebo":
+        if float(results["avg_p_wave"]) > 135 or float(results["avg_qt_interval"]) > 435:
+            firestore_client.collection("Users").document(userID).collection("weekly_report").document(weekID).update({"warnings": (warnings+1)})
+            
+    firestore_client.collection("Users").document(userID).collection("weekly_reports").document(weekID).collection("reports").document(reportID).set(entry) 
+    
 
 # https://us-central1-test-auth-eaf78.cloudfunctions.net/addmessage?text=uppercasemetoo
 # https://us-central1-eureka-44973.cloudfunctions.net/addmessage?text=uppercasemetoo
