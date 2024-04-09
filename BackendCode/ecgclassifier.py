@@ -67,7 +67,7 @@ def ecgClassify(profile, ecg_signals, model, encoders):
     # # input_data_np = input_data_np / 4095        # normalize unit
 
     # Process signal / input_data using neurokit2
-    signals, info = nk.ecg_process(ecg_signals, sampling_rate=100) # Change sampling rate (min: 500 readings / 10 sec or 100 readings / 5 secs
+    signals, info = nk.ecg_process(ecg_signals, sampling_rate=40) # Change sampling rate (min: 500 readings / 10 sec or 100 readings / 5 secs
 
     # ECG Characteristics
     # avg_r_peak = avg_r_peak_reading(signals, info)
@@ -104,11 +104,12 @@ def ecgClassify(profile, ecg_signals, model, encoders):
     heartbeats = epochs_heartbeats.groupby("Time")[["ECG_Clean"]].mean()
     # print(f"{mean_heartbeat=}")
     avg_heartbeat = heartbeats["ECG_Clean"].tolist()
-    print(f"{avg_heartbeat=}")
+    # print(f"{avg_heartbeat=}")
 
 
     results = {
         "condition": condition,
+        "ecg_signals": ecg_signals.tolist(),
         "avg_heartbeat": avg_heartbeat,
         "pr_interval": avg_pr_interval,
         "qt_interval": avg_qt_interval,

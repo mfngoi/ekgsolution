@@ -14,7 +14,7 @@ class ReportPage extends StatefulWidget {
 }
 
 class _ReportPageState extends State<ReportPage> {
-  late Future<List> avg_heartbeat;
+  late Future<Map> report;
   late User user;
 
   @override
@@ -23,14 +23,13 @@ class _ReportPageState extends State<ReportPage> {
     print("Entered ReportPage: ");
 
     user = auth.currentUser!;
-    avg_heartbeat = QueryAvgHeartBeat();
+    report = QueryReport();
   }
 
-  Future<List> QueryAvgHeartBeat() async {
-    List avg_heartbeat = [];
+  Future<Map> QueryReport() async {
     final db = await FirebaseFirestore.instance; // Connect to db
 
-    await db
+    Map report = await db
         .collection("users_test")
         .doc(user.uid)
         .collection("weekly_reports")
@@ -42,16 +41,12 @@ class _ReportPageState extends State<ReportPage> {
       (DocumentSnapshot doc) {
         final data = doc.data()
             as Map<String, dynamic>; // Gives you the document as a Map
-        // print(data);
-        // print(data["avg_heartbeat"]);
-        for (int i = 0; i < data["avg_heartbeat"].length; i++) {
-          avg_heartbeat.add(data["avg_heartbeat"][i]);
-        }
+        return data;
       },
       onError: (e) => print("Error getting document: $e"),
     );
 
-    return avg_heartbeat;
+    return report;
   }
 
   Widget BackButton() {
@@ -65,15 +60,16 @@ class _ReportPageState extends State<ReportPage> {
 
   Widget TopWindowSection() {
     return FutureBuilder(
-      future: avg_heartbeat,
+      future: report,
       builder: (context, snapshot) {
         if (snapshot.hasData) {
-          List avg_heartbeat = snapshot.data as List;
+          Map report = snapshot.data as Map;
+          List avg_heartbeat = report["avg_heartbeat"] as List;
           // print(avg_heartbeat);
 
           return TopWindow(avg_heartbeat);
         } else {
-          return Text("Unable to get recent report from database...");
+          return Text("Unable to get avg heartbeat from database...");
         }
       },
     );
@@ -109,6 +105,54 @@ class _ReportPageState extends State<ReportPage> {
     );
   }
 
+  Widget BottomWindowSection() {
+    return FutureBuilder(
+      future: report,
+      builder: (context, snapshot) {
+        if (snapshot.hasData) {
+          Map report = snapshot.data as Map;
+
+          return BottomWindow(report);
+        } else {
+          return Text("Unable to get recent report from database...");
+        }
+      },
+    );
+  }
+
+  Widget BottomWindow(Map report) {
+    return Container(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 30.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            ClipRRect(
+              borderRadius: BorderRadius.circular(7.0),
+              child: Container(
+                height: 200,
+                width: double.infinity,
+                color: const Color.fromARGB(255, 223, 173, 231),
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      Text("Condition: " + report["condition"]),
+                      Text("PR Interval: " + report["pr_interval"].toString()),
+                      Text("QT Interval: " + report["qt_interval"].toString()),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   List<FlSpot> generatePoints(List values) {
     List<FlSpot> points = [];
 
@@ -127,8 +171,27 @@ class _ReportPageState extends State<ReportPage> {
           children: <Widget>[
             SizedBox(height: 70),
             BackButton(),
-            Text("This is the report page"),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 30.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: <Widget>[
+                  Text("AVG Heartbeat"),
+                ],
+              ),
+            ),
             TopWindowSection(),
+            SizedBox(height: 20),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 30.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: <Widget>[
+                  Text("Additional Information"),
+                ],
+              ),
+            ),
+            BottomWindowSection(),
           ],
         ),
       ),

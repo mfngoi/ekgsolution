@@ -130,8 +130,8 @@ class _ReportListPageState extends State<ReportListPage> {
               borderRadius: BorderRadius.circular(7.0),
               child: Container(
                 height: 200,
-                color: Colors.purple,
                 child: ListView(
+                  padding: EdgeInsets.zero,
                   children: reportRows,
                 ),
               ),

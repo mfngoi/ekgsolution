@@ -1,6 +1,8 @@
 import flask
 import pickle
 import json
+import base64
+import bitarray
 import numpy as np
 from flask import request
 from news_data import news_data
@@ -54,17 +56,29 @@ def ekgClassify():
     profile = json.loads(profile)   # Convert string to python dictionary
 
     # Handling signals
-    ecg_signals = request.form['signals']
-    ecg_signals = ecg_signals.split(',')
-    ecg_signals.pop() # Clean end of signal (loose string)
+    signals = request.form['signals']
+    signals = signals.strip()
+    # print(f"{signals=}")
 
-    print(f"{ecg_signals=}")
+    # Decode signals base64 into "signals"
+    decoded_bytes = base64.b64decode(signals)   # bytes
+    b_array = bitarray.bitarray()
+    b_array.frombytes(decoded_bytes) # bit array
+
+    # Turn each 12 bit into a decimal number
+    ecg_signals = []
+    for i in range(len(b_array)//12):
+        start_idx = i * 12
+        end_idx = (i+1) * 12
+        num = int(b_array[start_idx : end_idx].to01(), 2)
+        ecg_signals.append(num)
+    # print(f"{ecg_signals=}")
 
     # Format signal into numpy array    
     input_data_np = np.asarray(ecg_signals, dtype=np.float64)       # convert to type float64
-    print(f"{input_data_np=}")
+    # print(f"{input_data_np=}")
 
-    input_data_np = input_data_np / 4095        # normalize unit
+    # input_data_np = input_data_np / 4095        # normalize unit
 
     # Get condition in result
     results = ecgClassify(profile, input_data_np, ecgClassifier, encoders)
