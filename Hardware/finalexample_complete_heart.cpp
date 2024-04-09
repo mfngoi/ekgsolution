@@ -47,7 +47,7 @@ void loop()
 int uploadEKGData(String cmd)
 {
   const int size = 500;
-  size_t b_size = size * (3 / 2);
+  size_t b_size = size * 1.5;
 
   // Store ecg signals raw then in 4 bits form
   unsigned short ekgSignals[size];
