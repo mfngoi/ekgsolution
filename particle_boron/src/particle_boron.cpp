@@ -36,6 +36,8 @@ void setup()
 
   // initialize the serial communication:
   Serial.begin(9600);
+  pinMode(D0, INPUT); // Setup for leads off detection LO +
+  pinMode(D1, INPUT); // Setup for leads off detection LO -
 }
 
 void loop()
@@ -52,13 +54,21 @@ int uploadEKGData(String cmd)
   uint8_t binarySignals[b_size]; // Used to store binary data
 
   Serial.printf("Collecting %d signals\n", size);
-  short ekgCounter = 0;
+  int ekgCounter = 0;
   while (ekgCounter < size)
   {
 
-    unsigned short r = rand() % 4096; // Reading Sample
-    Serial.println(ekgCounter);
-    ekgSignals[ekgCounter] = ekgCounter;
+    if ((digitalRead(D0) == 1) || (digitalRead(D1) == 1))
+    {
+      ekgSignals[ekgCounter] = 0;
+      Serial.println(0);
+    }
+    else
+    {
+      unsigned short output = analogRead(A0);
+      ekgSignals[ekgCounter] = output;
+      Serial.println(output);
+    }
 
     delay(25); // Wait for a bit to keep serial data from saturating
     ekgCounter += 1;
@@ -97,7 +107,7 @@ int uploadEKGData(String cmd)
   }
   Serial.println("=======================================");
   Serial.println(index);
-  
+
   // Encode binarySignals to base64
   size_t encodedLen = Base64::getEncodedSize(b_size, true);
   char *encoded = new char[encodedLen]; // Destination variable

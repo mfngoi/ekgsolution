@@ -44,7 +44,7 @@ void loop()
 
 int uploadEKGData(String cmd)
 {
-  const int size = 500;
+  const int size = 400;
   size_t b_size = size * 1.5;
 
   // Store ecg signals raw then in 4 bits form
@@ -56,11 +56,11 @@ int uploadEKGData(String cmd)
   while (ekgCounter < size)
   {
 
-    unsigned short r = rand() % 4096; // Reading Sample
+    // unsigned short r = rand() % 4096; // Reading Sample
     Serial.println(ekgCounter);
     ekgSignals[ekgCounter] = ekgCounter;
 
-    delay(10); // Wait for a bit to keep serial data from saturating
+    delay(25); // Wait for a bit to keep serial data from saturating
     ekgCounter += 1;
   }
   Serial.printf("Finished collecting %d signals\n", size);
@@ -97,14 +97,7 @@ int uploadEKGData(String cmd)
   }
   Serial.println("=======================================");
   Serial.println(index);
-  Serial.println("=======================================");
-  for (int i=0; i<b_size; i++) {
-    Serial.print(binarySignals[i]);
-    Serial.print("   ");
-    Serial.println(binarySignals[i], BIN);
-  }
   
-
   // Encode binarySignals to base64
   size_t encodedLen = Base64::getEncodedSize(b_size, true);
   char *encoded = new char[encodedLen]; // Destination variable

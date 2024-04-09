@@ -46,7 +46,7 @@ void loop()
 
 int uploadEKGData(String cmd)
 {
-  const int size = 500;
+  const int size = 400;
   size_t b_size = size * 1.5;
 
   // Store ecg signals raw then in 4 bits form
@@ -60,8 +60,8 @@ int uploadEKGData(String cmd)
 
     if ((digitalRead(D0) == 1) || (digitalRead(D1) == 1))
     {
-      ekgSignals[ekgCounter] = -1;
-      Serial.println(-1);
+      ekgSignals[ekgCounter] = 0;
+      Serial.println(0);
     }
     else
     {
@@ -70,7 +70,7 @@ int uploadEKGData(String cmd)
       Serial.println(output);
     }
 
-    delay(10); // Wait for a bit to keep serial data from saturating
+    delay(25); // Wait for a bit to keep serial data from saturating
     ekgCounter += 1;
   }
   Serial.printf("Finished collecting %d signals\n", size);
