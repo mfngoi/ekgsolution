@@ -3,6 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:test_application/main.dart';
+import 'package:test_application/reportpage.dart';
 import 'package:test_application/reportweeklistpage.dart';
 import 'package:test_application/newspage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -156,6 +157,42 @@ class _HomePageState extends State<HomePage> {
     }
 
     return 0;
+  }
+
+  Future<int> triggerDevice2() async {
+    print(user.uid);
+    print("Attempting connection to device...");
+
+    String link = "http://localhost:5000/diagnose";
+    DateTime date = DateTime.now();
+    Map data = {
+      "args": user.uid,
+      "created_on": date.toString(),
+    };
+    var body = json.encode(data);
+
+    var response = await http.post(Uri.parse(link),
+        headers: {"Content-Type": "application/json"}, body: body);
+
+    // If success
+    if (response.statusCode == 200) {
+      print("Triggered device...");
+      // Calculate week number based on date
+      int weekOfYear = date.weekday == DateTime.sunday
+          ? date.difference(DateTime(date.year, 1, 1)).inDays ~/ 7 + 1
+          : date.difference(DateTime(date.year, 1, 1)).inDays ~/ 7;
+      String weekDocId = weekOfYear.toString() + "_" + date.year.toString();
+
+      // Redirect to report page
+      Navigator.of(context).push(
+        MaterialPageRoute(builder: (context) => ReportPage(week_id: weekDocId, report_id: date.toString(),)));
+
+      return 1;
+    } else {
+      print("Failed to trigger device...");
+      return 0;
+    }
+
   }
 
   void SubmitSampleReports() async {
