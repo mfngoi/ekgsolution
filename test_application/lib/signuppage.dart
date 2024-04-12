@@ -165,12 +165,12 @@ class _SignUpPageState extends State<SignUpPage> {
     print("Created Account");
 
     // Create user information in database
-    final weekReport = <String, dynamic>{
-      "warnings": 0,
-    };
-    final report = <String, dynamic>{
-      "signals": [200, 300, 400, 500, 600, 700, 800, 500, 400, 300, 400]
-    };
+    // final weekReport = <String, dynamic>{
+    //   "warnings": 0,
+    // };
+    // final report = <String, dynamic>{
+    //   "signals": [200, 300, 400, 500, 600, 700, 800, 500, 400, 300, 400]
+    // };
     final user = <String, dynamic>{
       "email": _emailController.text,
       "sex": "?",
@@ -187,32 +187,31 @@ class _SignUpPageState extends State<SignUpPage> {
         .doc(credential.user?.uid)
         .set(user); // Add user info to database
 
+    // // Code to determine what week the report should be stored in
+    // DateTime date = DateTime.now();
 
-    // Code to determine what week the report should be stored in
-    DateTime date = DateTime.now();
+    // int weekOfYear = date.weekday == DateTime.sunday
+    //     ? date.difference(DateTime(date.year, 1, 1)).inDays ~/ 7 + 1
+    //     : date.difference(DateTime(date.year, 1, 1)).inDays ~/ 7;
 
-    int weekOfYear = date.weekday == DateTime.sunday
-        ? date.difference(DateTime(date.year, 1, 1)).inDays ~/ 7 + 1
-        : date.difference(DateTime(date.year, 1, 1)).inDays ~/ 7;
+    // String weekDocId = weekOfYear.toString() + "_" + date.year.toString();
 
-    String weekDocId = weekOfYear.toString() + "_" + date.year.toString();
+    // await db
+    //     .collection("users_test")
+    //     .doc(credential.user?.uid)
+    //     .collection("weekly_reports") // create colletion for weeks
+    //     .doc(weekDocId)
+    //     .set(weekReport); // Add warnings field
 
-    await db
-        .collection("users_test")
-        .doc(credential.user?.uid)
-        .collection("weekly_reports") // create colletion for weeks
-        .doc(weekDocId)
-        .set(weekReport); // Add warnings field
-
-    await db
-        .collection("users_test")
-        .doc(credential.user?.uid)
-        .collection("weekly_reports")
-        .doc(weekDocId)
-        .collection("reports")  // create collection for reports in each week
-        .doc(date.toString())
-        .set(report);  // Add dummy ekg report into db
-    print("Created User Data");
+    // await db
+    //     .collection("users_test")
+    //     .doc(credential.user?.uid)
+    //     .collection("weekly_reports")
+    //     .doc(weekDocId)
+    //     .collection("reports")  // create collection for reports in each week
+    //     .doc(date.toString())
+    //     .set(report);  // Add dummy ekg report into db
+    // print("Created User Data");
 
     navigateToMasterPage();
   }

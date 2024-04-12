@@ -3,6 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:test_application/main.dart';
+import 'package:test_application/profilepage.dart';
 import 'package:test_application/reportpage.dart';
 import 'package:test_application/reportweeklistpage.dart';
 import 'package:test_application/newspage.dart';
@@ -82,23 +83,23 @@ class _HomePageState extends State<HomePage> {
 
     // print(user_data);
     
-    if (user_data["age"] == 0 ) {
+    if (user_data["age"] == 0 || user_data["age"] == "") {
       print("Must fill out age");
       return false;
     }
-    if (user_data["sex"] == "?" ) {
+    if (user_data["sex"] == "?" || user_data["sex"] == "") {
       print("Must fill out sex");
       return false;
     }
-    if (user_data["race"] == "?" ) {
+    if (user_data["race"] == "?" || user_data["race"] == "") {
       print("Must fill out race");
       return false;
     }
-    if (user_data["height"] == 0 ) {
+    if (user_data["height"] == 0 || user_data["height"] == "") {
       print("Must fill out height");
       return false;
     }
-    if (user_data["weight"] == 0 ) {
+    if (user_data["weight"] == 0 || user_data["weight"] == "") {
       print("Must fill out weight");
       return false;
     }
@@ -117,6 +118,15 @@ class _HomePageState extends State<HomePage> {
       },
     );
 
+    // Navigate to About Me
+    Widget aboutMeBtn = TextButton(
+      child: Text("Go to About Me"),
+      onPressed: () {
+        Navigator.of(context).pop(); // dismiss dialog alert
+        Navigator.of(context).push(MaterialPageRoute(builder: (context) => ProfilePage()));
+      },
+    );
+
     // set up AlertDialog
     CupertinoAlertDialog alert = CupertinoAlertDialog(
       title: Text("Profile Incomplete!"),
@@ -124,6 +134,7 @@ class _HomePageState extends State<HomePage> {
           "Navigate to the \"About Me\" page and fill out your information to begin diagnosis."),
       actions: <Widget>[
         okButton,
+        aboutMeBtn,
       ],
     );
 

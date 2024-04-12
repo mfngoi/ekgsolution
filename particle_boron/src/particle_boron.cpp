@@ -123,7 +123,7 @@ int uploadEKGData(String cmd)
 
     String data = String::format("{ \"data\": \"%s\", \"uid\": \"%s\" }", signals.c_str(), uid.c_str());
 
-    Particle.publish("PublishTest", data);
+    Particle.publish("Publish", data);
   }
   else
   {

@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 import neurokit2 as nk
 import pickle
-from csv_process import avg_r_peak_reading, avg_pr_interval_reading, avg_qt_interval_reading
+from BackendCode.Classifier.csv_process_v1 import avg_r_peak_reading, avg_pr_interval_reading, avg_qt_interval_reading
 
 # Load model
 with open('target/ecgClassifier.pkl', 'rb') as f:

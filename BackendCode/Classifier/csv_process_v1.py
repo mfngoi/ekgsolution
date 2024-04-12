@@ -6,6 +6,7 @@ import pickle
 import math
 from sklearn.preprocessing import LabelEncoder
 
+
 # Load data from compiled csv
 csv = pd.read_csv('target/compiled_dataset.csv')
 
@@ -67,7 +68,7 @@ def process_csv(csv, encode=True):
 
         except Exception as e:
             print(f"Exception Occured: [{e.__class__.__name__}]")
-            print(f"[{i} out of {ROWS}] skipped... ")
+            print(f"[{i} of {ROWS}] skipped... ")
 
         print(f"{int(round(i/ROWS, 2)*100)}% completed [{i} out of {ROWS}]... ")
 
@@ -162,6 +163,9 @@ def avg_qt_interval_reading(signals, info):
 
 
 if __name__ == "___main___":
+
+
+
     # Get important features from ecg signals
     processed_dataset = process_csv(csv)
 

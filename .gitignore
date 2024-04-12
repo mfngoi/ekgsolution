@@ -6,6 +6,8 @@ BackendCode/Classifier/__pycache__/
 BackendCode/ecg_data/
 BackendCode/reportdata.txt
 
+BackendCode/subjects/
+
 BackendCode/target/ecgClassifier.pkl
 BackendCode/target/encoder.pkl
 BackendCode/target/condition_encoder.pkl
