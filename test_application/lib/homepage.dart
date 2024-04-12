@@ -22,6 +22,9 @@ class _HomePageState extends State<HomePage> {
   late Future<Map> newsInfo;
   late User user;
 
+  int _currentCard = 0;
+  final CarouselController _controller = CarouselController();
+
   @override
   void initState() {
     super.initState();
@@ -54,9 +57,8 @@ class _HomePageState extends State<HomePage> {
 
   // Fork between trigger device or send alert
   void DiagnoseFunction() async {
-
     if (await checkUserDataAlert()) {
-      triggerDevice(); 
+      triggerDevice();
     } else {
       showUserDataAlert(context);
     }
@@ -64,15 +66,11 @@ class _HomePageState extends State<HomePage> {
 
   // Will notify user to fill out data before diagnose
   Future<bool> checkUserDataAlert() async {
-
     // Query for user data
     final db = await FirebaseFirestore.instance; // Connect to database
 
-    final user_data = await db
-        .collection("users_test")
-        .doc(user.uid)
-        .get()
-        .then(
+    final user_data =
+        await db.collection("users_test").doc(user.uid).get().then(
       (DocumentSnapshot doc) {
         final data = doc.data() as Map<String, dynamic>;
         // print(data);
@@ -82,7 +80,7 @@ class _HomePageState extends State<HomePage> {
     );
 
     // print(user_data);
-    
+
     if (user_data["age"] == 0 || user_data["age"] == "") {
       print("Must fill out age");
       return false;
@@ -123,7 +121,8 @@ class _HomePageState extends State<HomePage> {
       child: Text("Go to About Me"),
       onPressed: () {
         Navigator.of(context).pop(); // dismiss dialog alert
-        Navigator.of(context).push(MaterialPageRoute(builder: (context) => ProfilePage()));
+        Navigator.of(context)
+            .push(MaterialPageRoute(builder: (context) => ProfilePage()));
       },
     );
 
@@ -195,15 +194,17 @@ class _HomePageState extends State<HomePage> {
       String weekDocId = weekOfYear.toString() + "_" + date.year.toString();
 
       // Redirect to report page
-      Navigator.of(context).push(
-        MaterialPageRoute(builder: (context) => ReportPage(week_id: weekDocId, report_id: date.toString(),)));
+      Navigator.of(context).push(MaterialPageRoute(
+          builder: (context) => ReportPage(
+                week_id: weekDocId,
+                report_id: date.toString(),
+              )));
 
       return 1;
     } else {
       print("Failed to trigger device...");
       return 0;
     }
-
   }
 
   void SubmitSampleReports() async {
@@ -10918,29 +10919,72 @@ class _HomePageState extends State<HomePage> {
         MaterialPageRoute(builder: (context) => NewsPage(newsData: newsData)));
   }
 
-  Widget CustomGestureDetector(Map<String, dynamic> newsData) {
-    // FUTURE -> should accept title and content as well
-    return GestureDetector(
-      onTap: () {
-        navigateToNewsPage(
-            newsData); // FUTURE -> should accept title and content
-      },
+  Widget CarouselCards(Map<String, dynamic> newsData) {
+    String article_title = newsData["article_title"];
+    String article_content =
+        newsData["article_content"].substring(0, 50) + "...";
+    String image_urls = newsData["image"];
+
+    return Container(
       child: Container(
-        child: Container(
-          margin: EdgeInsets.all(5.0),
-          child: ClipRRect(
-            borderRadius: BorderRadius.all(Radius.circular(5.0)),
-            child: Stack(
-              fit: StackFit.expand,
+        color: const Color.fromARGB(255, 215, 177, 222),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: <Widget>[
+            Column(
+              mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
-                Image.network(newsData["image"]!,
-                    fit: BoxFit.cover, width: 1000.0),
+                Text(article_title),
+                Container(
+                  color: Colors.purple,
+                  width: 150.0,
+                  child: Wrap(
+                    children: [
+                      Text(article_content),
+                    ],
+                  ),
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    navigateToNewsPage(
+                        newsData); // FUTURE -> should accept title and content
+                  },
+                  child: Text("View More"),
+                ),
               ],
             ),
-          ),
+            Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Image.network(image_urls, fit: BoxFit.cover, width: 100.0),
+              ],
+            ),
+          ],
         ),
       ),
     );
+
+    // return GestureDetector(
+    //   onTap: () {
+    //     navigateToNewsPage(
+    //         newsData); // FUTURE -> should accept title and content
+    //   },
+    //   child: Container(
+    //     child: Container(
+    //       margin: EdgeInsets.all(5.0),
+    //       child: ClipRRect(
+    //         borderRadius: BorderRadius.all(Radius.circular(5.0)),
+    //         child: Stack(
+    //           fit: StackFit.expand,
+    //           children: <Widget>[
+    //             Image.network(image_urls,
+    //                 fit: BoxFit.cover, width: 1000.0),
+    //           ],
+    //         ),
+    //       ),
+    //     ),
+    //   ),
+    // );
   }
 
   Widget DianoseNow() {
@@ -10997,38 +11041,75 @@ class _HomePageState extends State<HomePage> {
 
   // Modify NewsCarousel to accept "items"
   Widget NewsCarousel(List<Widget> newsCards) {
-    // FUTURE
     return Container(
       child: CarouselSlider(
         options: CarouselOptions(
-          height: 370,
-          autoPlay: true,
-          aspectRatio: 2.0,
-          enlargeCenterPage: true,
-        ),
+            viewportFraction: 1.0,
+            onPageChanged: (index, reason) {
+              setState(() {
+                _currentCard = index;
+              });
+            }),
         items: newsCards,
       ),
     );
   }
 
-  Widget NewsSection() {
+  Widget NewsIndicator(Map newsinfo) {
+    List<Widget> circles = [];
+    for (int i = 0; i < newsinfo.length; i++) {
+      if (i == _currentCard) {
+        circles.add(Icon(Icons.circle));
+      } else {
+        circles.add(Icon(Icons.circle_outlined));
+      }
+    }
+
+    return Container(
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: circles,
+      ),
+    );
+  }
+
+  Widget FutureNewsSection() {
     return FutureBuilder(
       future: newsInfo,
       builder: (context, snapshot) {
         if (snapshot.hasData) {
           Map newsInfo = snapshot.data as Map;
-
-          final List news = newsInfo.keys.toList();
-          List<Widget> newsCards = [];
-          for (int i = 0; i < news.length; i++) {
-            newsCards.add(CustomGestureDetector(newsInfo[news[i]]));
-          }
-
-          return NewsCarousel(newsCards);
+          return NewsSection(newsInfo);
         } else {
           return Text("Unable to get news from server...");
         }
       },
+    );
+  }
+
+  Widget NewsSection(Map newsInfo) {
+    // print(newsInfo);
+
+    // Extract each news map from list
+    final List news = newsInfo.keys.toList();
+    List<Widget> newsCards = [];
+    for (int i = 0; i < news.length; i++) {
+      newsCards.add(CarouselCards(newsInfo[news[i]]));
+    }
+
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 30.0),
+      child: ClipRRect(
+          borderRadius: BorderRadius.all(Radius.circular(10.0)),
+          child: Container(
+            color: Colors.purple,
+            child: Column(
+              children: <Widget>[
+                NewsCarousel(newsCards),
+                NewsIndicator(newsInfo),
+              ],
+            ),
+          )),
     );
   }
 
@@ -11052,7 +11133,7 @@ class _HomePageState extends State<HomePage> {
             SizedBox(height: 20),
             CheckReport(),
             SizedBox(height: 40),
-            NewsSection(),
+            FutureNewsSection(),
           ],
         ),
       ),
