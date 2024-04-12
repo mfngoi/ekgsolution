@@ -17,7 +17,7 @@ class _ProfilePageState extends State<ProfilePage> {
   late User user;
   late Future<Map> user_info;
 
-  bool _editMode = true;
+  bool _editMode = false;
   String ethnicityValue = ethnic.first;
 
   final _sexController = TextEditingController();

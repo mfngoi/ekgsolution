@@ -5,41 +5,52 @@ import neurokit2 as nk
 
 # Process sample for average pr interval
 def avg_pr_interval_reading(signals, info):
+    # P WAVE ALGORITHM
+    all_p_waves = []
+    for index in range(len(info['ECG_P_Onsets'])):
+        p_onset = info['ECG_P_Onsets'][index]
+        p_offset = info['ECG_P_Offsets'][index]
+        if not math.isnan(p_onset) and not math.isnan(p_offset):
+            p_wave = p_offset - p_onset
+            all_p_waves.append(p_wave)
 
-    # Find values of all pr_intervals in reading
-    pr_interval_values = []
-    for beat in range(len(info['ECG_P_Onsets'])):
-        p_onset = info['ECG_P_Onsets'][beat]
-        r_onset = info['ECG_R_Onsets'][beat]
-        if not math.isnan(p_onset) and not math.isnan(r_onset):
-            pr_interval_values.append(r_onset - p_onset)
-    # print(f"{pr_interval_values=}")
-        
-    # Calculate and save average
-    total = sum(pr_interval_values)
-    avg_pr_interval = round(total/len(pr_interval_values))    
-
-    return avg_pr_interval
+    average_p_wave = round(sum(all_p_waves)/len(all_p_waves), 6)
+    return average_p_wave
 
 # Process sample for average Q-Peak to T-Offset interval
 def avg_qt_interval_reading(signals, info):
 
-    # Find values of all qt_intervals in reading
-    qt_interval_values = []
-    for beat in range(len(info['ECG_Q_Peaks'])):
-        q_peak = info['ECG_Q_Peaks'][beat]
-        t_offset = info['ECG_T_Offsets'][beat]
+    all_qt_intervals = []
+    for index in range(len(info['ECG_Q_Peaks'])):
+        q_peak = info['ECG_Q_Peaks'][index]
+        t_offset = info['ECG_T_Offsets'][index]
+
+        # r_peak = info['ECG_R_Peaks'][i]
+
+
         if not math.isnan(q_peak) and not math.isnan(t_offset):
-            qt_interval_values.append(t_offset - q_peak)
-    # print(qt_interval_values)
-        
-    # Calculate and save average
-    total = sum(qt_interval_values)
-    avg_qt_interval = round(total/len(qt_interval_values))       
+            qt_intervals = t_offset - q_peak
+            all_qt_intervals.append(qt_intervals)
+    
+    average_qt_interval = round(sum(all_qt_intervals)/len(all_qt_intervals), 6)
 
-    return avg_qt_interval
+    # rr_intervals = calculate_rr_intervals
+
+    # average_rr = 
+
+    # qtc = average_qt_interval / average_rr
+
+    return average_qt_interval
 
 
+
+# def detect_r_peaks(ecg_signal, sampling_rate):
+#     peaks, _ = find_peaks(ecg_signal, height=np.max(ecg_signal)*0.5, distance=sampling_rate*0.6)
+#     return peaks
+
+# def calculate_rr_intervals(r_peaks, sampling_rate):
+#     rr_intervals = np.diff(r_peaks) / sampling_rate  #Convert indices to seconds
+#     return rr_intervals
 
 
 # =====
