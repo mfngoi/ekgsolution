@@ -88,7 +88,7 @@ avg_qt = avg_qt_interval_reading(ecg_signals, info)
 # print(f"{avg_pr=}")
 print(f"{avg_qt=}")
 
-avg_qtc = avg_qt / avg_rr
+avg_qtc = avg_qt / math.sqrt(avg_rr/1000)
 print(f"{avg_qtc=}")
 
 # # Examine plot (Displays ecg analysis overview)s
