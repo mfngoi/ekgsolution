@@ -1,119 +1,101 @@
+import 'package:flutter/material.dart';
+import 'package:test_application/reportpage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/material.dart';
 import 'package:test_application/main.dart';
-import 'package:test_application/reportpage.dart';
 
 class ReportListPage extends StatefulWidget {
-  final String week_id;
-  const ReportListPage({super.key, required this.week_id});
+  final String weekId;
+  const ReportListPage({super.key, required this.weekId});
+
   @override
   State<ReportListPage> createState() => _ReportListPageState();
 }
 
 class _ReportListPageState extends State<ReportListPage> {
-  late Future<List<QueryDocumentSnapshot>> reports;
+  late Future<List> reportList; // Variable to hold the list of reports
   late User user;
 
+  // Tells the page what to do when it first opens
   @override
   void initState() {
     super.initState();
-    print("Entered ReportListPage: " + widget.week_id);
-
     user = auth.currentUser!;
-    reports = QueryReports();
+    reportList =
+        QueryReportList(); // Asking the db for a list of the user's reports
   }
 
-  Future<List<QueryDocumentSnapshot>> QueryReports() async {
-    List<QueryDocumentSnapshot> reports = [];
-    final db = await FirebaseFirestore.instance; // Connect to db
+  Future<List> QueryReportList() async {
+    final db = await FirebaseFirestore.instance; // Connect to database
+    List reportList = [];
 
-    // Query all documents in reports collection in specific user
+    // Ask the database for reports
     await db
         .collection("users_test")
         .doc(user.uid)
         .collection("weekly_reports")
-        .doc(widget.week_id)
+        .doc(widget.weekId)
         .collection("reports")
         .get()
         .then(
       (querySnapshot) {
         for (var docSnapshot in querySnapshot.docs) {
-          reports.add(docSnapshot);
-          print(docSnapshot.id);
+          reportList.add(docSnapshot.id);
           // print(docSnapshot.data());
         }
       },
       onError: (e) => print("Error completing: $e"),
     );
 
-    // Sort report from most recent to least recent
-    reports
-        .sort((a, b) => DateTime.parse(b.id).compareTo(DateTime.parse(a.id)));
+    // Sorting...
+    reportList.sort((b, a) => a.compareTo(b));
 
-    return reports;
+    return reportList;
   }
 
-  void navigateToReportPage(String report_id) {
+  void navigateToReportPage(String weekId, String reportId) {
     Navigator.of(context).push(MaterialPageRoute(
-        builder: (context) =>
-            ReportPage(week_id: widget.week_id, report_id: report_id)));
+        builder: (context) => ReportPage(weekId: weekId, reportId: reportId)));
   }
 
-  Widget BackButton() {
-    return ElevatedButton(
-      onPressed: () {
-        Navigator.pop(context);
-      },
-      child: Text("Back"),
-    );
-  }
-
-  Widget ReportListSection() {
-    return FutureBuilder(
-      future: reports,
-      builder: (context, snapshot) {
-        if (snapshot.hasData) {
-          List<QueryDocumentSnapshot> reports =
-              snapshot.data as List<QueryDocumentSnapshot>;
-          // print(reports);
-
-          List<Widget> reportChildren = [];
-          for (int i = 0; i < reports.length; i++) {
-            reportChildren.add(ReportRow(reports[i].id));
-          }
-
-          return ReportList(reportChildren);
-        } else {
-          return Text("Unable to get reports from database...");
-        }
-      },
-    );
-  }
-
-  Widget ReportRow(String report_id) {
+  Widget ReportRow(String reportName) {
     return GestureDetector(
       onTap: () {
-        navigateToReportPage(report_id);
+        navigateToReportPage(widget.weekId, reportName);
       },
       child: Container(
+          height: 35,
           margin: const EdgeInsets.only(bottom: 5.0),
-          color: Color.fromARGB(255, 223, 173, 231),
+          color: Color.fromARGB(255, 159, 168, 218),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: <Widget>[
-              Icon(Icons.settings),
-              Text(report_id),
-              Icon(
-                Icons.arrow_forward_ios,
-                size: 15,
+              Padding(
+                padding: const EdgeInsets.only(left: 4.0),
+                child: Icon(Icons.file_copy),
+              ),
+              Text(reportName),
+              Padding(
+                padding: const EdgeInsets.only(right: 4.0),
+                child: Icon(
+                  Icons.arrow_forward_ios,
+                  size: 15,
+                ),
               ),
             ],
           )),
     );
   }
 
-  Widget ReportList(List<Widget> reportRows) {
+  List<Widget> generateReportRows(List reportList) {
+    List<Widget> reportRows = [];
+    for (int i = 0; i < reportList.length; i++) {
+      reportRows.add(ReportRow(reportList[i]));
+    }
+    return reportRows;
+  }
+
+  Widget ReportList(List reportList) {
     return Container(
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 30.0),
@@ -123,16 +105,18 @@ class _ReportListPageState extends State<ReportListPage> {
             Row(
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
-                Text("Past Reports"),
+                Text("Current Week's Reports",
+                    style:
+                        TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
               ],
             ),
+            SizedBox(height: 20),
             ClipRRect(
-              borderRadius: BorderRadius.circular(7.0),
               child: Container(
-                height: 200,
+                height: 700,
                 child: ListView(
                   padding: EdgeInsets.zero,
-                  children: reportRows,
+                  children: generateReportRows(reportList),
                 ),
               ),
             ),
@@ -142,16 +126,48 @@ class _ReportListPageState extends State<ReportListPage> {
     );
   }
 
+  Widget FutureReportList() {
+    return FutureBuilder(
+        future: reportList,
+        builder: (context, snapshot) {
+          if (snapshot.hasData) {
+            // render the report list on screen
+            List reportList = snapshot.data as List;
+            return ReportList(reportList);
+          } else {
+            return Text("An error occurred. Could not get report list");
+          }
+        });
+  }
+
+  Widget BackButton(BuildContext context) {
+    return IconButton(
+      icon: Icon(Icons.arrow_back, color: Color.fromRGBO(57, 73, 171, 1)),
+      onPressed: () {
+        Navigator.of(context).pop();
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           children: <Widget>[
             SizedBox(height: 70),
-            BackButton(),
-            ReportListSection()
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 30.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  BackButton(context),
+                ],
+              ),
+            ),
+            FutureReportList(),
           ],
         ),
       ),

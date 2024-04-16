@@ -1,9 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:test_application/loginpage.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:test_application/main.dart';
-import 'package:test_application/masterpage.dart';
 
 class Splash extends StatefulWidget {
   const Splash({super.key});
@@ -17,35 +14,13 @@ class _SplashState extends State<Splash> {
   void initState() {
     super.initState();
 
-    // if (FirebaseAuth.instance.currentUser != null) {
-    //   print("================= PING =====================");
-    //   print(FirebaseAuth.instance.currentUser?.uid);
-    // }
-
     // Delay
-    Timer(Duration(milliseconds: 3000), navigateToApp);
-  }
-
-  void navigateToApp() {
-    auth.authStateChanges().listen((User? user) {
-      if (user == null) {
-        navigateToLoginPage();
-      } else {
-        navigateToHomePage();
-      }
-    });
-  }
-
-  void navigateToLoginPage() {
-    Navigator.push(
-        context, MaterialPageRoute(builder: (context) => LoginInPage()));
+    Timer(Duration(milliseconds: 3000), navigateToHomePage);
   }
 
   void navigateToHomePage() {
-    Navigator.push(
-        context,
-        MaterialPageRoute(
-            builder: (context) => MasterPage()));
+    Navigator.pushReplacement(
+        context, MaterialPageRoute(builder: (context) => LoginInPage()));
   }
 
   @override
@@ -55,10 +30,12 @@ class _SplashState extends State<Splash> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            Container(
-              color: Colors.purple,
-              height: 50,
-              width: 50,
+            ClipRect(
+              child: Align(
+                alignment: Alignment.center,
+                widthFactor: 0.8,
+                child: Image.asset("assets/app_icon.png"),
+              ),
             ),
             Text(
               "Σureka",

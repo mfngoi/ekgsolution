@@ -4,16 +4,21 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:test_application/loginpage.dart';
 import 'package:test_application/main.dart';
 
-const List<String> ethnic = <String>['WHITE', 'ASIAN', 'AFRICAN AMERICAN'];
+const List<String> ethnic = <String>[
+  'OTHER',
+  'WHITE',
+  'ASIAN',
+  'AFRICAN AMERICAN'
+];
 
-class ProfilePage extends StatefulWidget {
-  const ProfilePage({super.key});
+class AboutMePage extends StatefulWidget {
+  const AboutMePage({super.key});
 
   @override
-  State<ProfilePage> createState() => _ProfilePageState();
+  State<AboutMePage> createState() => _AboutMePageState();
 }
 
-class _ProfilePageState extends State<ProfilePage> {
+class _AboutMePageState extends State<AboutMePage> {
   late User user;
   late Future<Map> user_info;
 
@@ -24,7 +29,6 @@ class _ProfilePageState extends State<ProfilePage> {
   final _ageController = TextEditingController();
   final _heightController = TextEditingController();
   final _weightController = TextEditingController();
-  final _ethnicityController = TextEditingController();
 
   @override
   void initState() {
@@ -41,7 +45,6 @@ class _ProfilePageState extends State<ProfilePage> {
     _ageController.dispose();
     _heightController.dispose();
     _weightController.dispose();
-    _ethnicityController.dispose();
     super.dispose();
   }
 
@@ -61,14 +64,23 @@ class _ProfilePageState extends State<ProfilePage> {
     return user_info;
   }
 
-  Widget EditButton() {
-    return ElevatedButton(
+  Widget BackButton(BuildContext context) {
+    return IconButton(
+      icon: Icon(Icons.arrow_back, color: Color.fromRGBO(57, 73, 171, 1)),
+      onPressed: () {
+        Navigator.of(context).pop();
+      },
+    );
+  }
+
+  Widget EditButton(BuildContext context) {
+    return IconButton(
+      icon: Icon(Icons.edit, color: Color.fromRGBO(57, 73, 171, 1)),
       onPressed: () {
         setState(() {
           _editMode = !_editMode;
         });
       },
-      child: Icon(Icons.edit),
     );
   }
 
@@ -91,14 +103,14 @@ class _ProfilePageState extends State<ProfilePage> {
       mainAxisAlignment: MainAxisAlignment.center,
       children: <Widget>[
         Padding(
-          padding: EdgeInsets.symmetric(horizontal: 20.0),
+          padding: EdgeInsets.symmetric(horizontal: 30.0),
           child: Container(
             width: double.infinity,
             decoration: BoxDecoration(
               border: Border(
                 bottom: BorderSide(
-                  color: Colors.black, // Specify your border color here
-                  width: 2.0, // Specify your border width here
+                  color: Colors.black,
+                  width: 2.0,
                 ),
               ),
             ),
@@ -107,7 +119,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 user_info['email'],
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
-                  fontSize: 20.0,
+                  fontSize: 16.0,
                 ),
               ),
             ),
@@ -116,13 +128,13 @@ class _ProfilePageState extends State<ProfilePage> {
         SizedBox(height: 30),
         RowFields(user_info, "Age", 'age'),
         SizedBox(height: 10),
+        RowFields(user_info, "Sex", 'sex'),
+        SizedBox(height: 10),
         RowFields(user_info, "Height", 'height'),
         SizedBox(height: 10),
         RowFields(user_info, "Weight", 'weight'),
         SizedBox(height: 10),
-        RowFields(user_info, "Ethnicity", 'race'),
-        SizedBox(height: 10),
-        RowFields(user_info, "Sex", 'sex'),
+        RowFields(user_info, "Race", 'race'),
         SizedBox(height: 10),
       ],
     );
@@ -140,7 +152,7 @@ class _ProfilePageState extends State<ProfilePage> {
               width: 100.0,
               child: Text(
                 label + ": ",
-                style: TextStyle(fontSize: 20),
+                style: TextStyle(fontSize: 16),
               ),
             ),
             SizedBox(width: 50),
@@ -166,10 +178,10 @@ class _ProfilePageState extends State<ProfilePage> {
       return AgeTextField("Age");
     }
     if (value == 'height') {
-      return HeightTextField("Height");
+      return HeightTextField("Height (m)");
     }
     if (value == 'weight') {
-      return WeightTextField("Weight");
+      return WeightTextField("Weight (kg)");
     }
     if (value == 'race') {
       return EthnicityField("Something");
@@ -195,14 +207,15 @@ class _ProfilePageState extends State<ProfilePage> {
             borderRadius: BorderRadius.circular(
                 50.0), // Adjust the value to control the roundness
             borderSide: BorderSide(
-              color: Colors.purple, // Border color
+              color: const Color.fromRGBO(121, 134, 203, 1), // Border color
               width: 4,
             ),
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(50.0),
             borderSide: BorderSide(
-              color: Colors.purple, // Border color when focused
+              color: const Color.fromRGBO(
+                  121, 134, 203, 1), // Border color when focused
               width: 4,
             ),
           ),
@@ -226,14 +239,15 @@ class _ProfilePageState extends State<ProfilePage> {
             borderRadius: BorderRadius.circular(
                 50.0), // Adjust the value to control the roundness
             borderSide: BorderSide(
-              color: Colors.purple, // Border color
+              color: const Color.fromRGBO(121, 134, 203, 1), // Border color
               width: 4,
             ),
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(50.0),
             borderSide: BorderSide(
-              color: Colors.purple, // Border color when focused
+              color: const Color.fromRGBO(
+                  121, 134, 203, 1), // Border color when focused
               width: 4,
             ),
           ),
@@ -257,14 +271,15 @@ class _ProfilePageState extends State<ProfilePage> {
             borderRadius: BorderRadius.circular(
                 50.0), // Adjust the value to control the roundness
             borderSide: BorderSide(
-              color: Colors.purple, // Border color
+              color: const Color.fromRGBO(121, 134, 203, 1), // Border color
               width: 4,
             ),
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(50.0),
             borderSide: BorderSide(
-              color: Colors.purple, // Border color when focused
+              color: const Color.fromRGBO(
+                  121, 134, 203, 1), // Border color when focused
               width: 4,
             ),
           ),
@@ -288,14 +303,15 @@ class _ProfilePageState extends State<ProfilePage> {
             borderRadius: BorderRadius.circular(
                 50.0), // Adjust the value to control the roundness
             borderSide: BorderSide(
-              color: Colors.purple, // Border color
+              color: const Color.fromRGBO(121, 134, 203, 1), // Border color
               width: 4,
             ),
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(50.0),
             borderSide: BorderSide(
-              color: Colors.purple, // Border color when focused
+              color: const Color.fromRGBO(
+                  121, 134, 203, 1), // Border color when focused
               width: 4,
             ),
           ),
@@ -326,13 +342,23 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   void SubmitData() async {
-    final newData = <String, dynamic>{
-      "sex": _sexController.text,
-      "age": _ageController.text,
-      "height": _heightController.text,
-      "weight": _weightController.text,
-      "race": ethnicityValue,
-    };
+    Map<String, dynamic> newData = {};
+
+    if (_ageController.text != "") {
+      newData.addAll({"age": _ageController.text});
+    }
+    if (_sexController.text != "") {
+      newData.addAll({"sex": _sexController.text});
+    }
+    if (_heightController.text != "") {
+      newData.addAll({"height": _heightController.text});
+    }
+    if (_weightController.text != "") {
+      newData.addAll({"weight": _weightController.text});
+    }
+    if (ethnicityValue != "OTHER") {
+      newData.addAll({"race": ethnicityValue});
+    }
 
     final db = await FirebaseFirestore.instance; // Connect to database
 
@@ -343,7 +369,11 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   Widget LogOutButton() {
-    return ElevatedButton(onPressed: signOut, child: Text("Sign Out"));
+    return ElevatedButton(
+        onPressed: signOut,
+        child: Text(
+          "Sign Out",
+        ));
   }
 
   void signOut() async {
@@ -356,42 +386,35 @@ class _ProfilePageState extends State<ProfilePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      resizeToAvoidBottomInset: false,
       appBar: AppBar(
-        centerTitle: false,
-        leading: Padding(
-          padding: const EdgeInsets.only(left: 40.0),
-          child: Icon(
-            Icons.person,
-            color: Colors.purple,
-          ),
-        ),
-        title: Text(
-          "About Me",
-          style: TextStyle(
-              color: Colors.black, fontWeight: FontWeight.bold, fontSize: 25.0),
-        ),
+        leading: BackButton(context),
         actions: <Widget>[
-          ElevatedButton(
-              onPressed: () {
-                Navigator.pop(context);
-              },
-              child: Text("Back")),
+          Padding(
+            padding: EdgeInsets.only(right: 30),
+            child: EditButton(context),
+          ),
         ],
       ),
       body: Center(
-        child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: <Widget>[
-              SizedBox(height: 30),
-              EditButton(),
-              SizedBox(height: 20),
-              FutureFields(),
-              SizedBox(height: 50),
-              SubmitButton(),
-              SizedBox(height: 10),
-              LogOutButton(),
-            ]),
+        child: ListView(
+          children: <Widget>[
+            FutureFields(),
+            SizedBox(height: 40),
+            Center(
+              child: SizedBox(
+                width: 200, // Constrain the width of the button
+                child: SubmitButton(),
+              ),
+            ),
+            SizedBox(height: 10), // Spacing between buttons
+            Center(
+              child: SizedBox(
+                width: 200, // Constrain the width of the button
+                child: LogOutButton(),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

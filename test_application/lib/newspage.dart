@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 class NewsPage extends StatefulWidget {
-  // Reconsider news page parameters
   final Map<String, dynamic> newsData;
   const NewsPage({super.key, required this.newsData});
 
@@ -16,7 +15,7 @@ class _NewsPageState extends State<NewsPage> {
       width: double.infinity,
       decoration: BoxDecoration(
         image: DecorationImage(
-          image: NetworkImage(widget.newsData["image"]!),
+          image: NetworkImage(widget.newsData["image"]),
           fit: BoxFit.cover,
         ),
         borderRadius: BorderRadius.only(
@@ -39,7 +38,7 @@ class _NewsPageState extends State<NewsPage> {
               Padding(
                 padding: EdgeInsets.only(left: 20.0, bottom: 10.0),
                 child: Text(
-                  widget.newsData["article_title"]!,
+                  widget.newsData["article_title"],
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: 35.0,
@@ -76,7 +75,7 @@ class _NewsPageState extends State<NewsPage> {
           padding: EdgeInsets.only(top: 10),
           children: <Widget>[
             Text(
-              widget.newsData["article_content"]!,
+              widget.newsData["article_content"],
               textAlign: TextAlign.left,
               style: TextStyle(
                 color: Colors.black,

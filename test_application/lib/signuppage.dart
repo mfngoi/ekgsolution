@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:test_application/loginpage.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:test_application/masterpage.dart';
+import 'package:test_application/navigationpage.dart';
 
 class SignUpPage extends StatefulWidget {
   const SignUpPage({super.key});
@@ -12,6 +12,7 @@ class SignUpPage extends StatefulWidget {
 }
 
 class _SignUpPageState extends State<SignUpPage> {
+  final _nameController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController1 = TextEditingController();
   final _passwordController2 = TextEditingController();
@@ -19,24 +20,48 @@ class _SignUpPageState extends State<SignUpPage> {
   bool obscureValue1 = true;
   bool obscureValue2 = true;
 
-  @override
-  void dispose() {
-    _emailController.dispose();
-    _passwordController1.dispose();
-    _passwordController2.dispose();
-    super.dispose();
-  }
-
-  void navigateToMasterPage() {
+  void navigateToNavigationPage() {
     Navigator.of(context)
-        .push(MaterialPageRoute(builder: (context) => MasterPage()));
+        .push(MaterialPageRoute(builder: (context) => NavigationPage()));
   }
 
   void navigateToLoginPage() {
-    Navigator.pop(context);
+    Navigator.of(context)
+        .push(MaterialPageRoute(builder: (context) => const LoginInPage()));
   }
 
-  Widget CustomTextField(String hintValue) {
+  Widget NameTextField(String hintValue) {
+    return Container(
+      height: 35.0,
+      width: 350.0,
+      child: TextField(
+        controller: _nameController,
+        decoration: InputDecoration(
+          contentPadding: EdgeInsets.all(8.0),
+          hintText: hintValue,
+          filled: true,
+          fillColor: Colors.white, // Background color of the text field
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(
+                50.0), // Adjust the value to control the roundness
+            borderSide: BorderSide(
+              color: Colors.purple, // Border color
+              width: 4,
+            ),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(50.0),
+            borderSide: BorderSide(
+              color: Colors.purple, // Border color when focused
+              width: 4,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget EmailTextField(String hintValue) {
     return Container(
       height: 35.0,
       width: 350.0,
@@ -154,66 +179,59 @@ class _SignUpPageState extends State<SignUpPage> {
   }
 
   void SignUp() async {
-    print("Clicked Button");
     // Create a user account for firebase authentication
+    String name_text = _nameController.text;
     String email_text = _emailController.text;
     String password_text = _passwordController2.text;
-    UserCredential credential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
+
+    // Create an account
+    UserCredential cred =
+        await FirebaseAuth.instance.createUserWithEmailAndPassword(
       email: email_text,
       password: password_text,
     );
-    print("Created Account");
 
-    // Create user information in database
-    // final weekReport = <String, dynamic>{
-    //   "warnings": 0,
-    // };
-    // final report = <String, dynamic>{
-    //   "signals": [200, 300, 400, 500, 600, 700, 800, 500, 400, 300, 400]
-    // };
-    final user = <String, dynamic>{
-      "email": _emailController.text,
-      "sex": "?",
+    final profileInfo = {
+      "full_name": name_text,
+      "email": email_text,
       "age": 0,
+      "sex": "?",
       "height": 0,
       "weight": 0,
       "race": "?",
     };
 
+    // Allocate space for user data in the database
     final db = await FirebaseFirestore.instance; // Connect to database
-
     await db
         .collection("users_test")
-        .doc(credential.user?.uid)
-        .set(user); // Add user info to database
+        .doc(cred.user?.uid)
+        .set(profileInfo); // Creates a user folder in the database
 
-    // // Code to determine what week the report should be stored in
-    // DateTime date = DateTime.now();
-
-    // int weekOfYear = date.weekday == DateTime.sunday
-    //     ? date.difference(DateTime(date.year, 1, 1)).inDays ~/ 7 + 1
-    //     : date.difference(DateTime(date.year, 1, 1)).inDays ~/ 7;
-
-    // String weekDocId = weekOfYear.toString() + "_" + date.year.toString();
-
+    // final weekInfo = {
+    //   "warnings": 0,
+    // };
     // await db
     //     .collection("users_test")
-    //     .doc(credential.user?.uid)
-    //     .collection("weekly_reports") // create colletion for weeks
-    //     .doc(weekDocId)
-    //     .set(weekReport); // Add warnings field
-
-    // await db
-    //     .collection("users_test")
-    //     .doc(credential.user?.uid)
+    //     .doc(cred.user?.uid)
     //     .collection("weekly_reports")
-    //     .doc(weekDocId)
-    //     .collection("reports")  // create collection for reports in each week
-    //     .doc(date.toString())
-    //     .set(report);  // Add dummy ekg report into db
-    // print("Created User Data");
+    //     .doc("week11")                 // !!!!!!!!!!!!!!!!!!!!
+    //     .set(weekInfo); // creates weekly report list in user
 
-    navigateToMasterPage();
+    // final reportInfo = {
+    //   "signals": [1, 2, 3, 4, 5, 6],
+    // };
+    // await db
+    //     .collection("users_test")
+    //     .doc(cred.user?.uid)
+    //     .collection("weekly_reports")
+    //     .doc("week11")                 // !!!!!!!!!!!!!!!!!!!!
+    //     .collection("reports")
+    //     .doc(DateTime.now().toString())
+    //     .set(reportInfo);
+
+    // Navigate to homepage
+    navigateToNavigationPage();
   }
 
   Widget SignUpButton() {
@@ -229,6 +247,103 @@ class _SignUpPageState extends State<SignUpPage> {
               Colors.white), // Text color of the buttonof the button
         ),
         child: Text('Sign Up'),
+      ),
+    );
+  }
+
+  Widget birthdayDropdown() {
+    DateTime date = DateTime.now();
+
+    List months = [
+      'January',
+      'February',
+      'March',
+      'April',
+      'May',
+      'June',
+      'July',
+      'August',
+      'September',
+      'October',
+      'November',
+      'December'
+    ];
+
+    String selectedDay = date.day.toString(); // Default today's date
+    String selectedMonth = months[date.month - 1];
+    String selectedYear = date.year.toString();
+
+    List<DropdownMenuItem<String>> dayItems =
+        List<String>.generate(31, (index) => '${index + 1}')
+            .map((String value) {
+      return DropdownMenuItem<String>(
+        value: value,
+        child: Text(value),
+      );
+    }).toList();
+
+    List<DropdownMenuItem<String>> monthItems = [
+      'January',
+      'February',
+      'March',
+      'April',
+      'May',
+      'June',
+      'July',
+      'August',
+      'September',
+      'October',
+      'November',
+      'December'
+    ].map((String value) {
+      return DropdownMenuItem<String>(
+        value: value,
+        child: Text(value),
+      );
+    }).toList();
+
+    List<DropdownMenuItem<String>> yearItems =
+        List<String>.generate(100, (index) => '${DateTime.now().year - index}')
+            .map((String value) {
+      return DropdownMenuItem<String>(
+        value: value,
+        child: Text(value),
+      );
+    }).toList();
+
+    return Container(
+      width: 350,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: <Widget>[
+          DropdownButton<String>(
+            value: selectedDay,
+            onChanged: (newValue) {
+              setState(() {
+                selectedDay = newValue!;
+              });
+            },
+            items: dayItems,
+          ),
+          DropdownButton<String>(
+            value: selectedMonth,
+            onChanged: (newValue) {
+              setState(() {
+                selectedMonth = newValue!;
+              });
+            },
+            items: monthItems,
+          ),
+          DropdownButton<String>(
+            value: selectedYear,
+            onChanged: (newValue) {
+              setState(() {
+                selectedYear = newValue!;
+              });
+            },
+            items: yearItems,
+          ),
+        ],
       ),
     );
   }
@@ -274,9 +389,9 @@ class _SignUpPageState extends State<SignUpPage> {
                 ),
               ),
               SizedBox(height: 50),
-              CustomTextField("Email or Phone Number"),
+              NameTextField("Full Name"),
               SizedBox(height: 20),
-              CustomTextField("Full Name"),
+              EmailTextField("Email or Phone Number"),
               SizedBox(height: 20),
               CustomPasswordField1("Password"),
               Text(
@@ -289,6 +404,8 @@ class _SignUpPageState extends State<SignUpPage> {
               SizedBox(height: 20),
               CustomPasswordField2("Confirm Password"),
               SizedBox(height: 20),
+              birthdayDropdown(),
+              SizedBox(height: 40),
               SignUpButton(),
               SizedBox(height: 10),
               Row(
@@ -299,7 +416,9 @@ class _SignUpPageState extends State<SignUpPage> {
                       style: TextStyle(color: Colors.purple),
                     ),
                     TextButton(
-                        onPressed: navigateToLoginPage,
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
                         child: Text(
                           "Log In",
                           style: TextStyle(
@@ -308,7 +427,7 @@ class _SignUpPageState extends State<SignUpPage> {
                               color: Colors.purple),
                         )),
                   ]),
-              SizedBox(height: 150),
+              SizedBox(height: 100),
               Text("We need permission for the service you use. Learn more."),
             ],
           ),

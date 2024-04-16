@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:test_application/masterpage.dart';
+import 'package:test_application/main.dart';
 import 'package:test_application/signuppage.dart';
+import 'package:test_application/navigationpage.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 class LoginInPage extends StatefulWidget {
@@ -17,11 +18,14 @@ class _LoginInPageState extends State<LoginInPage> {
   bool obscureValue = true;
   bool rememberValue = true;
 
-    @override
-  void dispose() {
-    _emailController.dispose();
-    _passwordController.dispose();
-    super.dispose();
+  @override
+  void initState() {
+    super.initState();
+    auth.authStateChanges().listen((User? user) {
+      if (user != null) {
+        navigateToNavigationPage();
+      }
+    });
   }
 
   void navigateToSignUpPage() {
@@ -29,9 +33,9 @@ class _LoginInPageState extends State<LoginInPage> {
         .push(MaterialPageRoute(builder: (context) => const SignUpPage()));
   }
 
-  void navigateToHomePage() {
+  void navigateToNavigationPage() {
     Navigator.of(context)
-        .push(MaterialPageRoute(builder: (context) => MasterPage()));
+        .push(MaterialPageRoute(builder: (context) => NavigationPage()));
   }
 
   Widget CustomTextField(String hintValue) {
@@ -120,7 +124,7 @@ class _LoginInPageState extends State<LoginInPage> {
             password: _passwordController.text,
           )
               .then((_) {
-            navigateToHomePage();
+            navigateToNavigationPage();
           });
         },
         style: ButtonStyle(
@@ -144,7 +148,6 @@ class _LoginInPageState extends State<LoginInPage> {
           padding: const EdgeInsets.only(left: 40.0),
           child: Icon(
             Icons.file_copy,
-            color: Colors.purple,
           ),
         ),
         title: Text(
@@ -170,7 +173,6 @@ class _LoginInPageState extends State<LoginInPage> {
               "Please enter your login information",
               textAlign: TextAlign.center,
               style: TextStyle(
-                color: Colors.purple,
                 fontSize: 30,
               ),
             ),
@@ -199,7 +201,6 @@ class _LoginInPageState extends State<LoginInPage> {
                       Text(
                         "Remember me",
                         style: TextStyle(
-                          color: Colors.purple,
                           fontSize: 15,
                         ),
                       ),
@@ -208,7 +209,6 @@ class _LoginInPageState extends State<LoginInPage> {
                   Text(
                     "Forgot Password?",
                     style: TextStyle(
-                      color: Colors.purple,
                       fontSize: 15,
                     ),
                   ),
@@ -217,20 +217,19 @@ class _LoginInPageState extends State<LoginInPage> {
             ),
             SizedBox(height: 50),
             LoginButton(),
-            SizedBox(height: 270),
+            SizedBox(height: 230),
             Row(mainAxisAlignment: MainAxisAlignment.center, children: <Widget>[
               Text(
                 "Don't have an account?",
-                style: TextStyle(color: Colors.purple),
               ),
               TextButton(
                   onPressed: navigateToSignUpPage,
                   child: Text(
                     "Sign Up",
                     style: TextStyle(
-                        decoration: TextDecoration.underline,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.purple),
+                      decoration: TextDecoration.underline,
+                      fontWeight: FontWeight.bold,
+                    ),
                   )),
             ]),
           ],
