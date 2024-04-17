@@ -24,21 +24,11 @@ def avg_qt_interval_reading(signals, info):
     for index in range(len(info['ECG_Q_Peaks'])):
         q_peak = info['ECG_Q_Peaks'][index]
         t_offset = info['ECG_T_Offsets'][index]
-
-        # r_peak = info['ECG_R_Peaks'][i]
-
-
         if not math.isnan(q_peak) and not math.isnan(t_offset):
             qt_intervals = t_offset - q_peak
             all_qt_intervals.append(qt_intervals)
     
     average_qt_interval = round(sum(all_qt_intervals)/len(all_qt_intervals), 6)
-
-    # rr_intervals = calculate_rr_intervals
-
-    # average_rr = 
-
-    # qtc = average_qt_interval / average_rr
 
     return average_qt_interval
 

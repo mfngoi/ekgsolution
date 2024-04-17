@@ -2,7 +2,60 @@ import numpy as np
 import pandas as pd
 import neurokit2 as nk
 import pickle
-from BackendCode.Classifier.csv_process_v1 import avg_r_peak_reading, avg_pr_interval_reading, avg_qt_interval_reading
+import math
+
+def avg_r_peak_reading(signals, info):
+
+    # Find values of r_peaks indexes
+    # print(info['ECG_R_Peaks']) # Give index of r_peaks
+    r_peak_values = []
+    for r_index in info['ECG_R_Peaks']:
+        r_value = signals['ECG_Clean'][r_index]     # Retrieve value of cleaned ecg signal from index
+        r_peak_values.append(r_value)
+    # print(r_peak_values)
+
+    # Calculate and save average
+    total = round(sum(r_peak_values), 6)
+    avg_r_peak = round(total/len(r_peak_values), 6)
+
+    return avg_r_peak
+
+def avg_p_wave_reading(signals, info):
+    # P WAVE ALGORITHM
+    all_p_waves = []
+    for index in range(len(info['ECG_P_Onsets'])):
+        p_onset = info['ECG_P_Onsets'][index]
+        p_offset = info['ECG_P_Offsets'][index]
+        if not math.isnan(p_onset) and not math.isnan(p_offset):
+            p_wave = p_offset - p_onset
+            all_p_waves.append(p_wave)
+
+    average_p_wave = round(sum(all_p_waves)/len(all_p_waves), 6)
+    return average_p_wave
+
+def avg_qt_interval_reading(signals, info):
+
+    all_qt_intervals = []
+    for index in range(len(info['ECG_Q_Peaks'])):
+        q_peak = info['ECG_Q_Peaks'][index]
+        t_offset = info['ECG_T_Offsets'][index]
+        if not math.isnan(q_peak) and not math.isnan(t_offset):
+            qt_intervals = t_offset - q_peak
+            all_qt_intervals.append(qt_intervals)
+    
+    average_qt_interval = round(sum(all_qt_intervals)/len(all_qt_intervals), 6)
+
+    return average_qt_interval
+
+def avg_rr_reading(signals, info):
+    rr_readings = []
+    for i in range(len(info['ECG_R_Peaks'])-1):
+        curr_rr = info['ECG_R_Peaks'][i+1] - info['ECG_R_Peaks'][i]
+        rr_readings.append(curr_rr)
+
+    avg_rr = sum(rr_readings) / len(rr_readings)
+    return avg_rr
+
 
 # Load model
 with open('target/ecgClassifier.pkl', 'rb') as f:
@@ -42,8 +95,9 @@ signals, info = nk.ecg_process(input_data_np, sampling_rate=1000)
 
 # ECG Characteristics
 # avg_r_peak = avg_r_peak_reading(signals, info)
-avg_pr_interval = avg_pr_interval_reading(signals, info)
+avg_p_wave = avg_p_wave_reading(signals, info)
 avg_qt_interval = avg_qt_interval_reading(signals, info)
+avg_rr = avg_rr_reading(signals, info)
 
 # Human Characteristics
 # condition = ['Placebo']
@@ -68,8 +122,8 @@ my_dataframe = pd.DataFrame(
         'WEIGHT': weight,
         'ETHNICITY': ethnicity,
         # 'AVG_R_PEAK': [avg_r_peak],
-        'AVG_PR_INTERVAL': [avg_pr_interval],
-        'AVG_QT_INTERVAL': [avg_qt_interval],
+        'AVG_P_WAVE': [avg_p_wave],
+        'AVG_QTC_INTERVAL': [avg_qt_interval / math.sqrt(avg_rr/1000)],
     }
 )
 print(my_dataframe)
