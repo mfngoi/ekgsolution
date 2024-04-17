@@ -23,7 +23,9 @@ class _HomePageState extends State<HomePage> {
   late User user;
   // Initialize the index for the news carousel
   int _currentCard = 0;
-  int number = 10;
+
+  int _counter = 0;
+  late StreamController<int> _events;
 
   // Tells the page what to do when it first opens
   @override
@@ -31,6 +33,24 @@ class _HomePageState extends State<HomePage> {
     super.initState();
     user = auth.currentUser!;
     newsData = getNewsInfo();
+
+    _events = new StreamController<int>();
+    _events.add(60);
+  }
+
+  late Timer _timer;
+  void _startTimer() {
+    _counter = 60;
+    if (_timer != null) {
+      _timer.cancel();
+    }
+    _timer = Timer.periodic(Duration(seconds: 1), (timer) {
+      //setState(() {
+      (_counter > 0) ? _counter-- : _timer.cancel();
+      //});
+      print(_counter);
+      _events.add(_counter);
+    });
   }
 
   Future<Map> getNewsInfo() async {
@@ -147,36 +167,23 @@ class _HomePageState extends State<HomePage> {
   void diagnoseFunction() async {
     if (await isDataValid()) {
       triggerDevice();
-      number = 10;
-      const oneSec = const Duration(seconds: 1);
-      Timer timer = new Timer.periodic(
-        oneSec,
-        (Timer timer) {
-          if (number == 0) {
-            setState(() {
-              timer.cancel();
-            });
-          } else {
-            print(number);
-            countDownDisplay(context, number);
-            setState(() {
-              number--;
-            });
-            Timer(Duration(seconds: 1), () {
-              Navigator.of(context).pop();
-            });
-          }
-        },
-      );
+
+      _startTimer();
+      countDownDisplay(context);
     } else {
       showWarningPopUp(context);
     }
   }
 
-  void countDownDisplay(BuildContext context, int number) {
+  void countDownDisplay(BuildContext context) {
     CupertinoAlertDialog alert = CupertinoAlertDialog(
       title: Text("Diagnose Countdown"),
-      content: Text("$number"),
+      content: StreamBuilder<int>(
+          stream: _events.stream,
+          builder: (BuildContext context, AsyncSnapshot<int> snapshot) {
+            print(snapshot.data.toString());
+            return Container();
+          }),
     );
 
     showDialog(
