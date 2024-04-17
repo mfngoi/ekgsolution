@@ -24,8 +24,9 @@ class _HomePageState extends State<HomePage> {
   // Initialize the index for the news carousel
   int _currentCard = 0;
 
-  int _counter = 0;
+  late Timer _timer;
   late StreamController<int> _events;
+
 
   // Tells the page what to do when it first opens
   @override
@@ -35,23 +36,10 @@ class _HomePageState extends State<HomePage> {
     newsData = getNewsInfo();
 
     _events = new StreamController<int>();
-    _events.add(60);
+    _events.add(10);
   }
 
-  late Timer _timer;
-  void _startTimer() {
-    _counter = 60;
-    if (_timer != null) {
-      _timer.cancel();
-    }
-    _timer = Timer.periodic(Duration(seconds: 1), (timer) {
-      //setState(() {
-      (_counter > 0) ? _counter-- : _timer.cancel();
-      //});
-      print(_counter);
-      _events.add(_counter);
-    });
-  }
+  
 
   Future<Map> getNewsInfo() async {
     try {
@@ -166,9 +154,19 @@ class _HomePageState extends State<HomePage> {
 
   void diagnoseFunction() async {
     if (await isDataValid()) {
-      triggerDevice();
+      // triggerDevice();
+      print("Device triggered...");
 
-      _startTimer();
+      int _counter = 10;
+      _timer = Timer.periodic(Duration(seconds: 1), (timer) {
+        if (_counter > 0) {
+          _counter--;
+          _events.add(_counter);
+        } else {
+          _timer.cancel();
+          Navigator.of(context).pop();
+        }
+      });
       countDownDisplay(context);
     } else {
       showWarningPopUp(context);
@@ -182,7 +180,7 @@ class _HomePageState extends State<HomePage> {
           stream: _events.stream,
           builder: (BuildContext context, AsyncSnapshot<int> snapshot) {
             print(snapshot.data.toString());
-            return Container();
+            return Text(snapshot.data.toString());
           }),
     );
 
@@ -239,38 +237,6 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  // Widget CheckReport() {
-  //   return Container(
-  //     width: 350,
-  //     height: 60,
-  //     child: ElevatedButton(
-  //       style: ButtonStyle(
-  //         shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-  //           RoundedRectangleBorder(
-  //             borderRadius: BorderRadius.circular(
-  //                 10.0), // Adjust the value to control the roundness
-  //           ),
-  //         ),
-  //         padding: MaterialStateProperty.all<EdgeInsetsGeometry>(
-  //             EdgeInsets.all(16.0)),
-  //         backgroundColor: MaterialStateProperty.all<Color>(
-  //             const Color.fromRGBO(121, 134, 203, 1)),
-  //         foregroundColor: MaterialStateProperty.all<Color>(Colors.white),
-  //       ),
-  //       onPressed: () {
-  //         setState(() {
-  //           print("Clicked Check Report");
-  //           selectedIndex = 1;
-  //         });
-  //       },
-  //       child: Text(
-  //         "Check Report",
-  //         style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-  //         textAlign: TextAlign.center,
-  //       ),
-  //     ),
-  //   );
-  // }
 
   void showWarningPopUp(BuildContext context) {
     Widget cancelButton = TextButton(
@@ -388,10 +354,7 @@ class _HomePageState extends State<HomePage> {
             ),
             SizedBox(height: 50),
             DianoseNow(),
-            SizedBox(height: 20),
-            SizedBox(height: 60),
-            // CheckReport(),
-            SizedBox(height: 90),
+            SizedBox(height: 180),
             FutureNewsSection(),
           ],
         ),
