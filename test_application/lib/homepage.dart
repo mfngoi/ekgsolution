@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -22,6 +23,7 @@ class _HomePageState extends State<HomePage> {
   late User user;
   // Initialize the index for the news carousel
   int _currentCard = 0;
+  int number = 10;
 
   // Tells the page what to do when it first opens
   @override
@@ -119,7 +121,8 @@ class _HomePageState extends State<HomePage> {
     // Query for user data
     final db = await FirebaseFirestore.instance; // Connect to database
 
-    final user_data = await db.collection("Users").doc(user.uid).get().then(
+    final user_data =
+        await db.collection("users_test").doc(user.uid).get().then(
       (DocumentSnapshot doc) {
         final data = doc.data() as Map<String, dynamic>;
         return data;
@@ -144,9 +147,43 @@ class _HomePageState extends State<HomePage> {
   void diagnoseFunction() async {
     if (await isDataValid()) {
       triggerDevice();
+      number = 10;
+      const oneSec = const Duration(seconds: 1);
+      Timer timer = new Timer.periodic(
+        oneSec,
+        (Timer timer) {
+          if (number == 0) {
+            setState(() {
+              timer.cancel();
+            });
+          } else {
+            print(number);
+            countDownDisplay(context, number);
+            setState(() {
+              number--;
+            });
+            Timer(Duration(seconds: 1), () {
+              Navigator.of(context).pop();
+            });
+          }
+        },
+      );
     } else {
       showWarningPopUp(context);
     }
+  }
+
+  void countDownDisplay(BuildContext context, int number) {
+    CupertinoAlertDialog alert = CupertinoAlertDialog(
+      title: Text("Diagnose Countdown"),
+      content: Text("$number"),
+    );
+
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return alert;
+        });
   }
 
   Future<int> triggerDevice() async {
