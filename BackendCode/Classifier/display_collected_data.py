@@ -12,22 +12,22 @@ CONDITION = 'PLACEBO' # RANOLAZINE, VERAPAMIL, QUINIDINE, DOFETILIDE, PLACEBO
 race_csv = csv.loc[csv['RACE'] == RACE]
 race_sex_csv = race_csv.loc[race_csv['SEX'] == SEX]
 
-plt.title(f"{RACE} {CONDITION} (AVG_PR vs AGE)")
+plt.title(f"{RACE} {CONDITION} (AVG_P_WAVE vs AGE)")
 plt.xlabel('AGE')
 plt.ylabel('AVG_PR')
 plt.scatter(race_sex_csv['AGE'],race_sex_csv[f"{CONDITION}_PR"])
 plt.show()
 
-plt.title(f"{RACE} {CONDITION} (AVG_QT vs AGE)")
+plt.title(f"{RACE} {CONDITION} (AVG_QTC vs AGE)")
 plt.xlabel('AGE')
 plt.ylabel('AVG_QT')
 plt.scatter(race_sex_csv['AGE'],race_sex_csv[f"{CONDITION}_QT"])
 plt.show()
 
 
-asian_csv = csv.loc[csv['RACE'] == 'ASIAN']
+# asian_csv = csv.loc[csv['RACE'] == 'ASIAN']
 
-african_csv = csv.loc[csv['RACE'] == 'AFRICAN AMERICAN']
+# african_csv = csv.loc[csv['RACE'] == 'AFRICAN AMERICAN']
 
 # Placebo
     # WHITE

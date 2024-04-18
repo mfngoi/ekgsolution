@@ -40,24 +40,24 @@ for subject in range(1001, 1023):
         condition = csv['CONDITION'][i]
 
         if condition == 'Placebo':
-            placebo_pr.append(csv['AVG_PR_INTERVAL'][i])
-            placebo_qt.append(csv['AVG_QT_INTERVAL'][i])
+            placebo_pr.append(csv['AVG_P_WAVE'][i])
+            placebo_qt.append(csv['AVG_QTC_INTERVAL'][i])
 
         if condition == 'Ranolazine':
-            ranolazine_pr.append(csv['AVG_PR_INTERVAL'][i])
-            ranolazine_qt.append(csv['AVG_QT_INTERVAL'][i])
+            ranolazine_pr.append(csv['AVG_P_WAVE'][i])
+            ranolazine_qt.append(csv['AVG_QTC_INTERVAL'][i])
 
         if condition == 'Verapamil HCL':
-            verapamil_pr.append(csv['AVG_PR_INTERVAL'][i])
-            verapamil_qt.append(csv['AVG_QT_INTERVAL'][i])
+            verapamil_pr.append(csv['AVG_P_WAVE'][i])
+            verapamil_qt.append(csv['AVG_QTC_INTERVAL'][i])
 
         if condition == 'Quinidine Sulph':
-            quinidine_pr.append(csv['AVG_PR_INTERVAL'][i])
-            quinidine_qt.append(csv['AVG_QT_INTERVAL'][i])
+            quinidine_pr.append(csv['AVG_P_WAVE'][i])
+            quinidine_qt.append(csv['AVG_QTC_INTERVAL'][i])
 
         if condition == 'Dofetilide':
-            dofetilide_pr.append(csv['AVG_PR_INTERVAL'][i])
-            dofetilide_qt.append(csv['AVG_QT_INTERVAL'][i])
+            dofetilide_pr.append(csv['AVG_P_WAVE'][i])
+            dofetilide_qt.append(csv['AVG_QTC_INTERVAL'][i])
 
     subject_ethnicity = csv['ETHNICITY'][0]
     subject_sex = csv['SEX'][0]

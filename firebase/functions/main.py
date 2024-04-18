@@ -104,7 +104,7 @@ def addsignals(event: db_fn.Event[db_fn.Change]) -> None:
         "prediction": results["prediction"],
         "avg_heartbeat": results["avg_heartbeat"],
         "avg_p_wave": results["avg_p_wave"],
-        "avg_qt_interval": results["avg_qt_interval"],
+        "avg_qtc_interval": results["avg_qtc_interval"],
     }
     print(f"Added report: {reportID} to user db... ")
 

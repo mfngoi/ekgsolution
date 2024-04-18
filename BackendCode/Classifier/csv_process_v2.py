@@ -80,7 +80,7 @@ for subject in subjects:
         if csv['RANDID'][i] == subject:
 
             print('=' * 30)
-            print(f"filename: {csv['index'][i]}  randid: {csv['RANDID'][i]}")
+            print(f"filename: {csv['EGREFID'][i]}  randid: {csv['RANDID'][i]}")
             signals, info = nk.ecg_process(training_data_np[i,:], sampling_rate=1000)
 
             # Build processed row from each file
