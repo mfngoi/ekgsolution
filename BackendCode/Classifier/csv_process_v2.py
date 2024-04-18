@@ -4,7 +4,7 @@ import numpy as np
 import neurokit2 as nk
 
 # Process sample for average pr interval
-def avg_pr_interval_reading(signals, info):
+def avg_p_wave(signals, info):
     # P WAVE ALGORITHM
     all_p_waves = []
     for index in range(len(info['ECG_P_Onsets'])):
@@ -32,20 +32,14 @@ def avg_qt_interval_reading(signals, info):
 
     return average_qt_interval
 
+def avg_rr_reading(signals, info):
+    rr_readings = []
+    for i in range(len(info['ECG_R_Peaks'])-1):
+        curr_rr = info['ECG_R_Peaks'][i+1] - info['ECG_R_Peaks'][i]
+        rr_readings.append(curr_rr)
 
-
-# def detect_r_peaks(ecg_signal, sampling_rate):
-#     peaks, _ = find_peaks(ecg_signal, height=np.max(ecg_signal)*0.5, distance=sampling_rate*0.6)
-#     return peaks
-
-# def calculate_rr_intervals(r_peaks, sampling_rate):
-#     rr_intervals = np.diff(r_peaks) / sampling_rate  #Convert indices to seconds
-#     return rr_intervals
-
-
-# =====
-# =====
-
+    avg_rr = sum(rr_readings) / len(rr_readings)
+    return avg_rr
 
 # Load data from compiled csv
 csv = pd.read_csv('target/compiled_dataset.csv')
@@ -77,8 +71,8 @@ for subject in subjects:
 
     # Build Columns for ecg signals
     # avg_r_peak_col = []
-    avg_pr_interval_col = []
-    avg_qt_interval_col = []
+    avg_p_wave_col = []
+    avg_qtc_interval_col = []
     # ...
 
     for i in range(ROWS):
@@ -86,21 +80,23 @@ for subject in subjects:
         if csv['RANDID'][i] == subject:
 
             print('=' * 30)
-            print(f"filename: {csv['EGREFID'][i]}  randid: {csv['RANDID'][i]}")
+            print(f"filename: {csv['index'][i]}  randid: {csv['RANDID'][i]}")
             signals, info = nk.ecg_process(training_data_np[i,:], sampling_rate=1000)
 
             # Build processed row from each file
             try:
                 # Find important characteritics from each row (10 sec reading)
                 # avg_r_peak = avg_r_peak_reading(signals, info)
-                avg_pr_interval = avg_pr_interval_reading(signals, info)
+                avg_p_wave_reading = avg_p_wave(signals, info)
                 avg_qt_interval = avg_qt_interval_reading(signals, info)
+                avg_rr = avg_rr_reading(signals, info)
+                avg_qtc_interval = avg_qt_interval / math.sqrt(avg_rr/1000)
                 # ...
                 
                 # Collect found values
                 # avg_r_peak_col.append(avg_r_peak)
-                avg_pr_interval_col.append(avg_pr_interval)
-                avg_qt_interval_col.append(avg_qt_interval)
+                avg_p_wave_col.append(avg_p_wave_reading)
+                avg_qtc_interval_col.append(avg_qtc_interval)
                 # ...
 
                 # Append characteristics of person
@@ -126,8 +122,8 @@ for subject in subjects:
             'WEIGHT': width_col,
             'ETHNICITY': ethnicity_col,
             # 'AVG_R_PEAK': avg_r_peak_col,
-            'AVG_PR_INTERVAL': avg_pr_interval_col,
-            'AVG_QT_INTERVAL': avg_qt_interval_col,
+            'AVG_P_WAVE': avg_p_wave_col,
+            'AVG_QTC_INTERVAL': avg_qtc_interval_col,
             # ...
         }
     )
