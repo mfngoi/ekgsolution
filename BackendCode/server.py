@@ -46,31 +46,27 @@ def example(myvar):
 def newsInfo():
     return flask.jsonify(news_data)
 
-# @app.route('/diagnose', methods=['GET', 'POST'])
-# def diagnose():
+@app.route('/diagnose', methods=['GET', 'POST'])
+def diagnose():
 
-#     try:
+    try:
 
-#         user_uid = request.json['args']
-#         date = request.json['created_on']
-#         print(f"{user_uid=}")
-#         print(f"{date=}")
+        user_uid = request.json['args']
+        date = request.json['created_on']
+        print(f"{user_uid=}")
+        print(f"{date=}")
 
-#         # route = "http://localhost:5000/newsinfo"
-#         # result = requests.get(url=route)
-#         # print(f"{result.text=}")
-
-#         device_url = "https://api.particle.io/v1/devices/e00fce684219e0e249d5bc42/uploadEKGData?access_token=40c9617030f65832904eb99528de3da5e7ebfe66"
+        device_url = "https://api.particle.io/v1/devices/e00fce684219e0e249d5bc42/uploadEKGData?access_token=40c9617030f65832904eb99528de3da5e7ebfe66"
         
-#         args = user_uid + "," + date
-#         print(f"{args=}")
-#         data = {"args": args}
-#         result = requests.post(url=device_url, data=data)
-#         print(result)
-#         print(type(result))
-#         return "success"
-#     except:
-#         return "failed"
+        args = user_uid + "," + date
+        print(f"{args=}")
+        data = {"args": args}
+        result = requests.post(url=device_url, data=data)
+        print(result)
+        print(type(result))
+        return "success"
+    except:
+        return "failed"
 
 @app.route("/ekgclassify", methods=['POST'])
 def ekgClassify():

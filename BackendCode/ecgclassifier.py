@@ -53,7 +53,7 @@ def ecgClassify(profile, ecg_signals, model, encoders):
     avg_qt_interval = avg_qt_interval_reading(signals, info)
     avg_rr = avg_rr_reading(signals, info)
 
-    avg_qtc_interval = avg_qt_interval / math.sqrt(avg_rr/1000)
+    avg_qtc_interval = avg_qt_interval / math.sqrt(avg_rr/40)
     print(f"{avg_qtc_interval=}")
 
     # Human Characteristics
@@ -95,7 +95,7 @@ def ecgClassify(profile, ecg_signals, model, encoders):
         "ecg_signals": ecg_signals.tolist(),
         "avg_heartbeat": avg_heartbeat,
         "pr_interval": avg_p_wave,
-        "qt_interval": avg_qt_interval,
+        "qt_interval": avg_qtc_interval,
     }
 
     return results

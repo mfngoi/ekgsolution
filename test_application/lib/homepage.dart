@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:test_application/newspage.dart';
+import 'package:test_application/reportpage.dart';
 import 'package:test_application/settingspage.dart';
 import 'package:test_application/weeklyreportpage.dart';
 import 'package:http/http.dart' as http;
@@ -25,8 +26,6 @@ class _HomePageState extends State<HomePage> {
   int _currentCard = 0;
 
   late Timer _timer;
-  late StreamController<int> _events;
-
 
   // Tells the page what to do when it first opens
   @override
@@ -34,12 +33,7 @@ class _HomePageState extends State<HomePage> {
     super.initState();
     user = auth.currentUser!;
     newsData = getNewsInfo();
-
-    _events = new StreamController<int>();
-    _events.add(10);
   }
-
-  
 
   Future<Map> getNewsInfo() async {
     try {
@@ -68,6 +62,11 @@ class _HomePageState extends State<HomePage> {
   void navigateToSettings() {
     Navigator.of(context)
         .push(MaterialPageRoute(builder: (context) => const SettingsPage()));
+  }
+
+  void navigateToReportPage(String weekId, String reportId) {
+    Navigator.of(context).push(MaterialPageRoute(
+        builder: (context) => ReportPage(weekId: weekId, reportId: reportId)));
   }
 
   Widget CarouselCards(Map<String, dynamic> newsData) {
@@ -155,31 +154,46 @@ class _HomePageState extends State<HomePage> {
   void diagnoseFunction() async {
     if (await isDataValid()) {
       // triggerDevice();
-      print("Device triggered...");
+      String reportDocID = DateTime.now().toString();
+      triggerDeviceServer(reportDocID);
 
-      int _counter = 10;
-      _timer = Timer.periodic(Duration(seconds: 1), (timer) {
-        if (_counter > 0) {
-          _counter--;
-          _events.add(_counter);
-        } else {
-          _timer.cancel();
-          Navigator.of(context).pop();
-        }
-      });
-      countDownDisplay(context);
+      countDownDisplay(
+          context, reportDocID); // Render countdown and navigate to report page
     } else {
       showWarningPopUp(context);
     }
   }
 
-  void countDownDisplay(BuildContext context) {
+  void countDownDisplay(BuildContext context, String reportDocID) {
+    int _counter = 10; // Number that will be printed
+    StreamController<int> _events = new StreamController<int>();
+    _events.add(_counter); // Insert number into stream to render
+    // Every 1 second, update stream number
+    _timer = Timer.periodic(Duration(seconds: 1), (timer) {
+      if (_counter > 0) {
+        _counter--;
+        _events.add(_counter); // Update number in stream
+      } else {
+        _timer.cancel();
+        Navigator.of(context).pop();
+
+        DateTime date = DateTime.parse(reportDocID);
+        int weekOfYear = date.weekday == DateTime.sunday
+            ? date.difference(DateTime(date.year, 1, 1)).inDays ~/ 7 + 1
+            : date.difference(DateTime(date.year, 1, 1)).inDays ~/ 7;
+        String weekDocID = weekOfYear.toString() + "_" + date.year.toString();
+
+        
+        navigateToReportPage(weekDocID, reportDocID);
+      }
+    });
+
     CupertinoAlertDialog alert = CupertinoAlertDialog(
       title: Text("Diagnose Countdown"),
       content: StreamBuilder<int>(
           stream: _events.stream,
           builder: (BuildContext context, AsyncSnapshot<int> snapshot) {
-            print(snapshot.data.toString());
+            // print(snapshot.data.toString());
             return Text(snapshot.data.toString());
           }),
     );
@@ -199,14 +213,43 @@ class _HomePageState extends State<HomePage> {
 
     var body = json.encode(data);
 
-    var response = await http.post(Uri.parse(link),
-        headers: {"Content-Type": "application/json"}, body: body);
+    var response = await http.post(
+      Uri.parse(link),
+      headers: {"Content-Type": "application/json"},
+      body: body,
+    );
 
     if (response.statusCode == 200) {
       print("Successfully triggered sensor to start reading...");
       return 1;
     }
     return 0;
+  }
+
+  Future<String> triggerDeviceServer(String reportDocID) async {
+    String link =
+        'https://api.particle.io/v1/devices/e00fce684219e0e249d5bc42/uploadEKGData?access_token=40c9617030f65832904eb99528de3da5e7ebfe66';
+    DateTime date = DateTime.parse(reportDocID);
+
+    // Map data = {
+    //   "args": user.uid,
+    //   "created_on": date.toString(),
+    // };
+    // var body = json.encode(data);
+
+    String boron_data = user.uid + "," + date.toString();
+    Map data = {
+      "args": boron_data,
+    };
+    var body = json.encode(data);
+
+    var response = await http.post(
+      Uri.parse(link),
+      headers: {"Content-Type": "application/json"},
+      body: body,
+    );
+
+    return date.toString();
   }
 
   Widget DianoseNow() {
@@ -236,7 +279,6 @@ class _HomePageState extends State<HomePage> {
       ),
     );
   }
-
 
   void showWarningPopUp(BuildContext context) {
     Widget cancelButton = TextButton(

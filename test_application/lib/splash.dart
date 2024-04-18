@@ -34,7 +34,10 @@ class _SplashState extends State<Splash> {
               child: Align(
                 alignment: Alignment.center,
                 widthFactor: 0.8,
-                child: Image.asset("assets/app_icon.png"),
+                child: Container(
+                  width: 250.0,
+                  child: Image.asset("assets/app_icon.png"),
+                ),
               ),
             ),
             Text(
