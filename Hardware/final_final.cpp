@@ -142,6 +142,18 @@ int doSomething(String cmd)
 {
   int result = 1;
   Serial.println("doSomething triggered (version 4)...");
+  Serial.println(cmd);
+
+  char user_id[50], report_id[50];
+  sscanf(cmd, "%[^,],%[^,]", &user_id, &report_id);
+  Serial.println(user_id);
+  Serial.println("==============");
+  Serial.println(report_id);
+  Serial.println("==============");
+
+  String data = String::format("{ \"data\": \"%s\", \"uid\": \"%s\" }", user_id, report_id);
+
+  Particle.publish("PublishTest", data);
 
   if (cmd == "red")
     Serial.println("Welcome to the matrix");
