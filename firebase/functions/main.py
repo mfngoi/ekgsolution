@@ -72,7 +72,7 @@ def addsignals(event: db_fn.Event[db_fn.Change]) -> None:
     # Create new document
     userID = data["json"]["user"]
     weekID = "week" + str(weekNum)
-    reportID = str(date)
+    reportID = data["json"]["report_id"]
 
     # Connect to database
     firestore_client: google.cloud.firestore.Client = firestore.client()
