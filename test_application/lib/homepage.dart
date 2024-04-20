@@ -183,7 +183,6 @@ class _HomePageState extends State<HomePage> {
             : date.difference(DateTime(date.year, 1, 1)).inDays ~/ 7;
         String weekDocID = weekOfYear.toString() + "_" + date.year.toString();
 
-        
         navigateToReportPage(weekDocID, reportDocID);
       }
     });

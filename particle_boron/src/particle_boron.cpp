@@ -111,7 +111,7 @@ int uploadEKGData(String cmd)
     }
   }
   Serial.println("=======================================");
-  Serial.println(index);
+  // Serial.println(index);
 
   // Encode binarySignals to base64
   size_t encodedLen = Base64::getEncodedSize(b_size, true);
@@ -119,15 +119,15 @@ int uploadEKGData(String cmd)
   bool success = Base64::encode(binarySignals, b_size, encoded, encodedLen, true);
   if (success)
   {
-    Serial.println("==================");
-    Serial.println(encodedLen);
-    Serial.println(encoded);
+    // Serial.println("==================");
+    // Serial.println(encodedLen);
+    // Serial.println(encoded);
 
     String signals = encoded;
 
     String data = String::format("{ \"data\": \"%s\", \"uid\": \"%s\", \"report_id\": \"%s\" }", signals.c_str(), user_id, report_id);
 
-    Particle.publish("PublishTest", data);
+    Particle.publish("Publish", data);
   }
   else
   {
