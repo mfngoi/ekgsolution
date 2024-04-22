@@ -50,13 +50,24 @@ def makeuppercase(event: firestore_fn.Event[firestore_fn.DocumentSnapshot | None
     upper = original.upper()
     event.data.reference.update({"uppercase": upper})
 
+def demoGroupClassify(route, profile, results, firestore_client, userID, weekID, warnings):
+    # url =  AWS SERVER + Route (ie. /white_m_classify)
+    server_url = "http://18.223.255.251:5000"
+    url = f"{server_url}{route}"
+    data = {"age": int(profile["age"]), "bmi": float(profile["weight"])/float(profile["height"])**2}
+    subject_p_wave_standard, subject_qtc_wave_standard = requests.post(url=url, data=data)
+    def check_p_wave():
+        return (float(results["avg_p_wave"]) > subject_p_wave_standard + 18)
+    def check_qtc_interval():
+        return (float(results["avg_qtc_interval"]) > subject_qtc_wave_standard + 37)
+    if check_p_wave() or check_qtc_interval():
+        firestore_client.collection("Users").document(userID).collection("weekly_reports").document(weekID).set({"warnings": warnings + 1})
+
 @db_fn.on_value_created(reference="/particle/{pushId}") # Change to database
 def addsignals(event: db_fn.Event[db_fn.Change]) -> None:
 
     # Access data
     data = event.data
-    # print("Access dictionary attempt")
-    # print(f"{data=}")
 
     # Get correct week number
     date = datetime.now()
@@ -80,9 +91,7 @@ def addsignals(event: db_fn.Event[db_fn.Change]) -> None:
     # Submit signals and user info to ecg server (classifier)
     url_post = "http://18.223.255.251:5000/classifier"
 
-    head = {
-        "Content-Type": "application/x-www-form-urlencoded",
-    }
+    head = {"Content-Type": "application/x-www-form-urlencoded"}
 
     # Gather user info (userID)
     doc = firestore_client.collection("Users").document(userID).get()
@@ -91,7 +100,7 @@ def addsignals(event: db_fn.Event[db_fn.Change]) -> None:
 
     new_data = {
         "profile": profile,
-        "signals": data["json"]["signals"], #slidjflwijdfliwdjflijw
+        "signals": data["json"]["signals"],
     }
 
     # Send data to amazon server
@@ -114,21 +123,49 @@ def addsignals(event: db_fn.Event[db_fn.Change]) -> None:
     # Add week if it does not exists
     if not doc.exists:
         print(f"{weekID} did not exist, creating document... ")
-        # Check if warnings needs to be increased
-        if (results["prediction"] != "Placebo" and float(results["avg_p_wave"]) > 135) or (results["prediction"] != "Placebo" and float(results["avg_qt_interval"]) > 435):
-            firestore_client.collection("Users").document(userID).collection("weekly_reports").document(weekID).set({"warnings": 1})
-        else:
-            firestore_client.collection("Users").document(userID).collection("weekly_reports").document(weekID).set({"warnings": 0})
-    else:
+        firestore_client.collection("Users").document(userID).collection("weekly_reports").document(weekID).set({"warnings": warnings})
+    else: 
         warnings = int(doc.to_dict()["warnings"]) # Get current value of warnings in doc if exists
-        # Check if warnings need to be increased
-        if (results["prediction"] != "Placebo" and float(results["avg_p_wave"]) > 135) or (results["prediction"] != "Placebo" and float(results["avg_qt_interval"]) > 435):
-            firestore_client.collection("Users").document(userID).collection("weekly_reports").document(weekID).update({"warnings": (warnings+1)})
+
+    # Check if warnings needs to be updated
+    if results["prediction"] != "Placebo":
+        # Male
+        if profile["sex"] == 'M':
+
+            if profile["race"] == 'ASIAN':
+                subject_p_wave_standard, subject_qtc_wave_standard = 106.51,413.56
+                def check_p_wave():
+                    return (float(results["avg_p_wave"]) > subject_p_wave_standard + 18)
+                def check_qtc_interval():
+                    return (float(results["avg_qtc_interval"]) > subject_qtc_wave_standard + 37)
+                if check_p_wave() or check_qtc_interval():
+                    firestore_client.collection("Users").document(userID).collection("weekly_reports").document(weekID).set({"warnings": warnings + 1})
+            if profile["race"] == 'AFRICAN AMERICAN':
+                # Select a given route in the server to identify closest subject
+                route = "/african_american_m_classify"
+                demoGroupClassify(route, profile, results, firestore_client, userID, weekID, warnings)
+
+            if profile["race"] == 'WHITE':
+                # Select a given route in the server to identify closest subject
+                route = "/white_m_classify"
+                demoGroupClassify(route, profile, results, firestore_client, userID, weekID, warnings)
+
+        # Female
+        if profile["sex"] == 'F':
+
+            if profile["race"] == 'AFRICAN AMERICAN':
+                # Select a given route in the server to identify closest subject
+                route = "/african_american_f_classify"
+                demoGroupClassify(route, profile, results, firestore_client, userID, weekID, warnings)
+
+            if profile["race"] == 'WHITE' or profile["race"] == 'ASIAN': # no existing Asian female subject to compare with
+                # Select a given route in the server to identify closest subject
+                route = "/white_f_classify"
+                demoGroupClassify(route, profile, results, firestore_client, userID, weekID, warnings)
+    else:
+        print("Prediction is Placebo: No Warnings Issued... ")
 
     # Add entry to database
     firestore_client.collection("Users").document(userID).collection("weekly_reports").document(weekID).collection("reports").document(reportID).set(entry) 
     
-
-# https://us-central1-test-auth-eaf78.cloudfunctions.net/addmessage?text=uppercasemetoo
-# https://us-central1-eureka-44973.cloudfunctions.net/addmessage?text=uppercasemetoo
     

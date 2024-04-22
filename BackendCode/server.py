@@ -15,6 +15,10 @@ app = flask.Flask(__name__) # Create a flask app (our server)
 with open('target/ecgClassifier.pkl', 'rb') as f:
     ecgClassifier = pickle.load(f)
 
+# Load other models
+with open('models/white_male_classifer.pkl', 'rb') as f:
+    w_m_classifier = pickle.load(f)
+
 # Load label encoders
 with open('target/condition_encoder.pkl', 'rb') as f:
     condition_encoder = pickle.load(f)
@@ -46,27 +50,27 @@ def example(myvar):
 def newsInfo():
     return flask.jsonify(news_data)
 
-@app.route('/diagnose', methods=['GET', 'POST'])
-def diagnose():
+# @app.route('/diagnose', methods=['GET', 'POST'])
+# def diagnose():
 
-    try:
+#     try:
 
-        user_uid = request.json['args']
-        date = request.json['created_on']
-        print(f"{user_uid=}")
-        print(f"{date=}")
+#         user_uid = request.json['args']
+#         date = request.json['created_on']
+#         print(f"{user_uid=}")
+#         print(f"{date=}")
 
-        device_url = "https://api.particle.io/v1/devices/e00fce684219e0e249d5bc42/uploadEKGData?access_token=40c9617030f65832904eb99528de3da5e7ebfe66"
+#         device_url = "https://api.particle.io/v1/devices/e00fce684219e0e249d5bc42/uploadEKGData?access_token=40c9617030f65832904eb99528de3da5e7ebfe66"
         
-        args = user_uid + "," + date
-        print(f"{args=}")
-        data = {"args": args}
-        result = requests.post(url=device_url, data=data)
-        print(result)
-        print(type(result))
-        return "success"
-    except:
-        return "failed"
+#         args = user_uid + "," + date
+#         print(f"{args=}")
+#         data = {"args": args}
+#         result = requests.post(url=device_url, data=data)
+#         print(result)
+#         print(type(result))
+#         return "success"
+#     except:
+#         return "failed"
 
 @app.route("/ekgclassify", methods=['POST'])
 def ekgClassify():
@@ -108,6 +112,13 @@ def ekgClassify():
     results = json.dumps(results)
     
     return results
+
+@app.route("/white_m_classify", methods=['POST'])
+def white_male_classify():
+
+
+    w_m_classifier
+
 
 if __name__ == '__main__': # Runs app when the program is started
     app.run(host='0.0.0.0', debug=True, port=5000)
