@@ -112,6 +112,7 @@ def addsignals(event: db_fn.Event[db_fn.Change]) -> None:
         "signals": results["decoded_signals"],
         "prediction": results["prediction"],
         "avg_heartbeat": results["avg_heartbeat"],
+        "heart_rate": results["heart_rate"],
         "avg_p_wave": results["avg_p_wave"],
         "avg_qtc_interval": results["avg_qtc_interval"],
     }

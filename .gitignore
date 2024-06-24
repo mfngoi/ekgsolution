@@ -23,6 +23,7 @@ firebase/functions/venv/
 .DS_Store
 
 ecg_key.pem
+eureka_key.json
 
 # Miscellaneous
 *.class

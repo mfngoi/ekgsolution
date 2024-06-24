@@ -4,6 +4,8 @@ from neurokit2.epochs import epochs_to_df
 import pandas as pd
 import numpy as np
 import math
+import statistics
+
 
 # Process sample for average pr interval
 def avg_pr_interval_reading(signals, info):
@@ -63,6 +65,13 @@ input_data_np = np.asarray(input_data, dtype=np.float64)       # convert to type
 # Process ecg
 ecg_signals, info = nk.ecg_process(input_data_np, sampling_rate=1000)
 print(f"{ecg_signals=}")
+print(ecg_signals["ECG_Rate"])
+# peak_info = nk.signal_findpeaks(ecg_signals)
+# rate = nk.signal_rate(peaks=peak_info["Peaks"], sampling_rate=1000)
+# print(f"{rate=}")
+
+
+# print(f"{ecg_signals["ECG_Rate"]=}")
 # print(ecg_signals.columns)
 # ecg_signals['ECG_P_Offsets'].to_csv('hello.csv')
 # print(ecg_signals['ECG_P_Offsets'])
@@ -132,3 +141,6 @@ print(f"{avg_qtc=}")
 # instant_peaks.to_csv('target/instant_peaks.csv')
 
 plt.show()
+
+print(ecg_signals["ECG_Rate"])
+print(statistics.mean(ecg_signals["ECG_Rate"].tolist()))
